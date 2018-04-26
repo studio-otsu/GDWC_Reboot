@@ -8,11 +8,11 @@ public class Cell : MonoBehaviour
     public int x;
     public int y;
     public enum CellType { NORMAL, HOLE, OBSTACLE }
-    public CellType type;
-    public CellType Type
+    private CellType TYPE;
+    public CellType type
     {
-        get { return type; }
-        set { type = value; ChangeSkin(); }
+        get { return TYPE; }
+        set { TYPE = value; ChangeSkin(); }
     }
 
     public void SetPosition(int xParam, int yParam)
@@ -25,21 +25,21 @@ public class Cell : MonoBehaviour
     {
         if (typeStr == "0")
         {
-            Type = CellType.NORMAL;
+            type = CellType.NORMAL;
         }
         else if (typeStr == "1")
         {
-            Type = CellType.HOLE;
+            type = CellType.HOLE;
         }
         else if (typeStr == "2")
         {
-            Type = CellType.OBSTACLE;
+            type = CellType.OBSTACLE;
         }
     }
 
     private void ChangeSkin()
     {
-        switch(Type)
+        switch(type)
         {
             case CellType.HOLE:
                 GetComponent<SpriteRenderer>().color = Color.black; break;

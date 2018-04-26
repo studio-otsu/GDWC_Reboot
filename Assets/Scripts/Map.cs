@@ -26,4 +26,25 @@ public class Map : MonoBehaviour
         float yPos = -((float)(height / 2)) - y + height;
         return new Vector3(xPos, yPos);
     }
+
+    public Cell GetCell(int x, int y)
+    {
+        return cells[CellIndex(x, y)];
+    }
+
+    public Cell GetCell(int index)
+    {
+        return cells[index];
+    }
+
+    /*
+     *  Static functions
+     */
+
+    public static bool IsAdjacent(Cell cell1, Cell cell2)
+    {
+        if (cell1.x == cell2.x && cell1.y == cell2.y) throw new System.Exception("IsAdjacent : same position");
+        int distance = Mathf.Abs(cell1.x - cell2.x) + Mathf.Abs(cell1.y - cell2.y);
+        return (distance == 1);
+    }
 }
