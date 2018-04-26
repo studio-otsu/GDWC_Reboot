@@ -8,6 +8,9 @@ public class Map : MonoBehaviour
     int width = 0;
     int height = 0;
 
+    public List<Cell> startingACells = new List<Cell>();
+    public List<Cell> startingBCells = new List<Cell>();
+
     public void SetDimensions(int widthParam, int heightParam)
     {
         width = widthParam;

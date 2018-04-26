@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class Cell : MonoBehaviour
 {
+
+    public Unit currentUnit;
+
     public int x;
     public int y;
     public enum CellType { NORMAL, HOLE, OBSTACLE }
