@@ -10,7 +10,7 @@ public class MapBuilder : MonoBehaviour
     public GameObject cellPrefab;
     public GameObject playerPrefab; //to be used later
 
-    private string path = "Data/Maps/map0";
+    private string path = "Assets/Data/Maps/map0";
 
     void Start()
     {
@@ -21,6 +21,7 @@ public class MapBuilder : MonoBehaviour
     {
         CalculateWidthHeight(filePath);
 
+        //Read the map file and create cell for each number
         StreamReader reader = new StreamReader(filePath);
         string line = reader.ReadLine();
         for (int y = 0; line != null; ++y, line = reader.ReadLine())
@@ -60,13 +61,10 @@ public class MapBuilder : MonoBehaviour
     {
         //Create gameobject
         GameObject createdCellObj = Instantiate(cellPrefab, map.CellPosition(x, y), Quaternion.identity, transform);
-        //Set position
+        //Set cell attributes
         Cell createdCell = createdCellObj.GetComponent<Cell>();
         createdCell.SetPosition(x, y);
-        //Set cell type
-        //
-        //  TODO
-        //
+        createdCell.SetTypeFromString(type);
         //Add Cell to Map
         map.cells[map.CellIndex(x, y)] = createdCell;
     }

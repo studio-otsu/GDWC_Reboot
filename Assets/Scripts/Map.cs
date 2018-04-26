@@ -23,7 +23,7 @@ public class Map : MonoBehaviour
     public Vector3 CellPosition(int x, int y)
     {
         float xPos = -((float)(width / 2)) + x;
-        float yPos = -((float)(height / 2)) + y;
+        float yPos = -((float)(height / 2)) - y + height;
         return new Vector3(xPos, yPos);
     }
 }
