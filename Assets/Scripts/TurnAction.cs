@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TurnAction {
+public struct TurnAction {
 	public Cell[] move;
 	public Player player;
 }

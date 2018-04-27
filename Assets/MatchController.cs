@@ -20,7 +20,7 @@ public class MatchController : MonoBehaviour {
     public void OnHoverCell(Cell c) {
     }
     public void OnClickEndTurn() {
-        match.EndCurrentPlayerTurn();
+        match.EndTurn();
     }
 
     public Match match;
@@ -65,5 +65,6 @@ public class MatchController : MonoBehaviour {
         if (turnTimerCoroutine != null)
             StopCoroutine(turnTimerCoroutine);
         turnTimerCoroutine = null;
+        turnTimer.text = "...";
     }
 }

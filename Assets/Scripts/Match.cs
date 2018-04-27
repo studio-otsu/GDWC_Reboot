@@ -12,6 +12,11 @@ public class Match : MonoBehaviour {
     public InputController controller;
     public MatchController matchController;
     public Map map;
+    public TurnSolver solver;
+
+    public Player player {
+        get { return players[playerTurn]; }
+    }
 
     public List<Player> players = new List<Player>();
     public List<Unit> teamA = new List<Unit>();
@@ -54,6 +59,10 @@ public class Match : MonoBehaviour {
         // init input controller
         //output.controller = new InputController(output);
         //output.StartMatch();
+        // other stuff
+        output.solver = new TurnSolver();
+        output.solver.match = output;
+        output.solver.map = output.map;
         return output;
     }
 
@@ -69,6 +78,10 @@ public class Match : MonoBehaviour {
         playerTurn = (playerTurn + 1) % players.Count;
         currentTurn += playerTurn == 0 ? 1 : 0;
         matchController.OnTurnStart(currentTurn, 5, playerTurn);
+    }
+
+    public void EndTurn() {
+        EndCurrentPlayerTurn();
     }
 
     public void EndCurrentPlayerTurn() {
@@ -87,22 +100,25 @@ public class Match : MonoBehaviour {
             StartNewTurn();
         } else {
             StartSolvePhase();
-            StartNewTurn();
         }
     }
 
     private void StartSolvePhase()
     {
+        StartCoroutine(DoSolvePhase());
+    }
+
+    private IEnumerator DoSolvePhase() {
         phase = TurnPhase.Solve;
-        /*
-            TODO : process player actions
-         */
-        
-        //Change turn
-        //++currentTurn;
-        //phase = TurnPhase.Choice;
-        //playerTurn = 0;
-        // changer de tour ne fais pas partie de la résolution de tour
+        StartCoroutine(solver.DoSolveMovements());
+        yield return new WaitWhile(delegate { return solver.isSolvingMovements; });
+        StartCoroutine(solver.DoSolveSpells());
+        yield return new WaitWhile(delegate { return solver.isSolvingSpells; });
+        EndSolvePhase();
+    }
+
+    private void EndSolvePhase() {
+        StartNewTurn();
     }
 
     //For debugging
