@@ -5,6 +5,11 @@ using UnityEngine;
 public class Helper : MonoBehaviour {
 
 	void Start () {
-        	Match.PrepareMatch("Assets/Data/Maps/map0");
+        Match m = Match.PrepareMatch("Assets/Data/Maps/map0");
+        MatchController mc = Instantiate(Resources.Load<GameObject>("Prefabs/MatchInterface")).GetComponent<MatchController>();
+        mc.match = m;
+        mc.map = m.map;
+        m.matchController = mc;
+        m.StartMatch();
 	}
 }

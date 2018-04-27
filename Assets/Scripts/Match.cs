@@ -10,6 +10,7 @@ public class Match : MonoBehaviour {
     public int playerTurn;
 
     public InputController controller;
+    public MatchController matchController;
     public Map map;
 
     public List<Player> players = new List<Player>();
@@ -51,28 +52,42 @@ public class Match : MonoBehaviour {
         Map.AddUnitToCell(p2, cell2);
         p2.transform.position = cell2.transform.position;
         // init input controller
-        output.controller = new InputController(output);
-        output.StartMatch();
+        //output.controller = new InputController(output);
+        //output.StartMatch();
         return output;
     }
 
-    private void StartMatch() {
+    public void StartMatch() {
         //Init match turn
         currentTurn = 0;
         phase = TurnPhase.Choice;
-        playerTurn = 0;
+        playerTurn = players.Count-1;
+        StartNewTurn();
+    }
+
+    private void StartNewTurn() {
+        playerTurn = (playerTurn + 1) % players.Count;
+        currentTurn += playerTurn == 0 ? 1 : 0;
+        matchController.OnTurnStart(currentTurn, 5, playerTurn);
     }
 
     public void EndCurrentPlayerTurn() {
+        matchController.OnTurnEnd();
         Player currentPlayer = players[playerTurn];
         /*
             TODO : retrieve player action and put them in a set to process the actions in the Solve phase
          */
-        if (playerTurn < (players.Count - 1)) {
+        /*if (playerTurn < (players.Count - 1)) {
             ++playerTurn;
         }
         else {
             StartSolvePhase();
+        }*/
+        if (playerTurn < (players.Count-1)) {
+            StartNewTurn();
+        } else {
+            StartSolvePhase();
+            StartNewTurn();
         }
     }
 
@@ -84,14 +99,15 @@ public class Match : MonoBehaviour {
          */
         
         //Change turn
-        ++currentTurn;
-        phase = TurnPhase.Choice;
-        playerTurn = 0;
+        //++currentTurn;
+        //phase = TurnPhase.Choice;
+        //playerTurn = 0;
+        // changer de tour ne fais pas partie de la résolution de tour
     }
 
     //For debugging
     void OnGUI() {
-        GUI.Label(new Rect(10,10,200,20), "Turn: " + currentTurn.ToString());
-        GUI.Label(new Rect(10,30,200,20), "PlayerTurn: " + playerTurn.ToString());
+        //GUI.Label(new Rect(10,10,200,20), "Turn: " + currentTurn.ToString());
+        //GUI.Label(new Rect(10,30,200,20), "PlayerTurn: " + playerTurn.ToString());
     }
 }
