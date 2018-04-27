@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class Helper : MonoBehaviour {
 
-	// Use this for initialization
 	void Start () {
-        Match.StartMatch("Assets/Data/Maps/map0");
+        	Match.PrepareMatch("Assets/Data/Maps/map0");
 	}
 }

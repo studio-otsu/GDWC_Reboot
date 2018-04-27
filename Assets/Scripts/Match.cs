@@ -5,7 +5,11 @@ using UnityEngine;
 public class Match : MonoBehaviour {
 
     public int currentTurn;
+    public enum TurnPhase { Choice, Solve }
+    public TurnPhase phase;
+    public int playerTurn;
 
+    public InputController controller;
     public Map map;
 
     public List<Player> players = new List<Player>();
@@ -16,7 +20,7 @@ public class Match : MonoBehaviour {
     public static Color colorTeamA = new Color(0, 0.8f, 0.2f);
     public static Color colorTeamB = new Color(0.6f, 0, 0.6f);
 
-    public static Match StartMatch(string mapPath) {
+    public static Match PrepareMatch(string mapPath) {
         Match output = new GameObject("Match").AddComponent<Match>();
         output.map = new GameObject("Map").AddComponent<Map>();
         output.map.transform.SetParent(output.transform);
@@ -41,14 +45,53 @@ public class Match : MonoBehaviour {
         output.players.Add(p2);
         // put players on map
         Cell cell1 = output.map.startingACells[0]; // player 1 start pos
-        p1.currentCell = cell1;
+        Map.AddUnitToCell(p1, cell1);
         p1.transform.position = cell1.transform.position;
-        cell1.currentUnit = p1;
         Cell cell2 = output.map.startingBCells[0]; // player 2 start pos
-        p2.currentCell = cell2;
+        Map.AddUnitToCell(p2, cell2);
         p2.transform.position = cell2.transform.position;
-        cell2.currentUnit = p2;
+        // init input controller
+        output.controller = new InputController(output);
+        output.StartMatch();
         return output;
     }
 
+    private void StartMatch() {
+        //Init match turn
+        currentTurn = 0;
+        phase = TurnPhase.Choice;
+        playerTurn = 0;
+    }
+
+    public void EndCurrentPlayerTurn() {
+        Player currentPlayer = players[playerTurn];
+        /*
+            TODO : retrieve player action and put them in a set to process the actions in the Solve phase
+         */
+        if (playerTurn < (players.Count - 1)) {
+            ++playerTurn;
+        }
+        else {
+            StartSolvePhase();
+        }
+    }
+
+    private void StartSolvePhase()
+    {
+        phase = TurnPhase.Solve;
+        /*
+            TODO : process player actions
+         */
+        
+        //Change turn
+        ++currentTurn;
+        phase = TurnPhase.Choice;
+        playerTurn = 0;
+    }
+
+    //For debugging
+    void OnGUI() {
+        GUI.Label(new Rect(10,10,200,20), "Turn: " + currentTurn.ToString());
+        GUI.Label(new Rect(10,30,200,20), "PlayerTurn: " + playerTurn.ToString());
+    }
 }

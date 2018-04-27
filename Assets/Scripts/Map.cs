@@ -44,6 +44,17 @@ public class Map : MonoBehaviour
      *  Static functions
      */
 
+    public static void MovePlayerToCell(Player player, Cell cell)
+    {
+
+    }
+
+    public static void AddUnitToCell(Unit unit, Cell cell)
+    {
+        unit.currentCell = cell;
+        cell.currentUnit = unit;
+    }
+
     public static bool IsAdjacent(Cell cell1, Cell cell2)
     {
         if (cell1.x == cell2.x && cell1.y == cell2.y) throw new System.Exception("IsAdjacent : same position");
