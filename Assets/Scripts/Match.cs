@@ -104,7 +104,6 @@ public class Match : MonoBehaviour {
 
     public void EndCurrentPlayerTurn() {
         matchController.OnTurnEnd();
-        foreach (Cell cell in map.cells) { cell.PutDefaultSkin(); }
         Player currentPlayer = players[playerTurn];
         if (playerTurn < (players.Count - 1)) {
             StartNewTurn();
