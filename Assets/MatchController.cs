@@ -15,6 +15,7 @@ public class MatchController : MonoBehaviour {
     public Text turnTimer;
     public Button endTurn;
     public Button[] spells;
+    public Toggle toggleAI;
 
     public RectTransform playerPanelsTeamA;
     public RectTransform playerPanelsTeamB;
