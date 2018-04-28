@@ -40,6 +40,42 @@ public class Map : MonoBehaviour
         return cells[index];
     }
 
+    public Cell TopCell(Cell cell)
+    {
+        if (cell.y > 0)
+        {
+            return GetCell(cell.x, cell.y - 1);
+        }
+        return null;
+    }
+
+    public Cell BotCell(Cell cell)
+    {
+        if (cell.y < height - 1)
+        {
+            return GetCell(cell.x, cell.y + 1);
+        }
+        return null;
+    }
+
+    public Cell LeftCell(Cell cell)
+    {
+        if (cell.x > 0)
+        {
+            return GetCell(cell.x - 1, cell.y);
+        }
+        return null;
+    }
+
+    public Cell RightCell(Cell cell)
+    {
+        if (cell.x < width - 1)
+        {
+            return GetCell(cell.x + 1, cell.y);
+        }
+        return null;
+    }
+
     /*
      *  Static functions
      */
@@ -57,8 +93,18 @@ public class Map : MonoBehaviour
 
     public static bool IsAdjacent(Cell cell1, Cell cell2)
     {
-        if (cell1.x == cell2.x && cell1.y == cell2.y) throw new System.Exception("IsAdjacent : same position");
-        int distance = Mathf.Abs(cell1.x - cell2.x) + Mathf.Abs(cell1.y - cell2.y);
+        if (SameCell(cell1, cell2)) throw new System.Exception("IsAdjacent : same position");
+        int distance = Distance(cell1, cell2);
         return (distance == 1);
+    }
+
+    public static int Distance(Cell cell1, Cell cell2)
+    {
+        return Mathf.Abs(cell1.x - cell2.x) + Mathf.Abs(cell1.y - cell2.y);
+    }
+
+    public static bool SameCell(Cell cell1, Cell cell2)
+    {
+        return cell1.x == cell2.x && cell1.y == cell2.y;
     }
 }

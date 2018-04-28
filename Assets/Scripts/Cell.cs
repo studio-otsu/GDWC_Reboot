@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class Cell : MonoBehaviour
 {
-
     public Unit currentUnit;
+    public bool toHighlight = false;
 
     public int x;
     public int y;
@@ -15,7 +15,7 @@ public class Cell : MonoBehaviour
     public CellType type
     {
         get { return TYPE; }
-        set { TYPE = value; ChangeSkin(); }
+        set { TYPE = value; PutDefaultSkin(); }
     }
 
     public void SetPosition(int xParam, int yParam)
@@ -40,7 +40,7 @@ public class Cell : MonoBehaviour
         }
     }
 
-    private void ChangeSkin()
+    public void PutDefaultSkin()
     {
         switch(type)
         {
@@ -53,4 +53,30 @@ public class Cell : MonoBehaviour
                 GetComponent<SpriteRenderer>().color = Color.white; break;
         }
     }
+
+    public void PutHoverSkin()
+    {
+        if (type == CellType.NORMAL)
+        {
+            GetComponent<SpriteRenderer>().color = Color.gray;
+        }
+    }
+
+    public void PutDisplayMPSkin()
+    {
+        GetComponent<SpriteRenderer>().color = new Color(0.3f, 0.8f, 0.1f);
+    }
+
+    private void OnMouseEnter()
+    {
+        MatchController.instance.OnMouseEnterNewCell(this);
+        PutHoverSkin();
+    }
+
+    private void OnMouseExit()
+    {
+        PutDefaultSkin();
+    }
+
+
 }
