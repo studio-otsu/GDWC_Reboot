@@ -29,7 +29,7 @@ public class TurnSolver {
         Dictionary<Cell, Player> nextPlayer = new Dictionary<Cell, Player>();
         List<Player> unmovablePlayers = new List<Player>();
         foreach (Player p in match.players) {
-            if (p.currentAction.move.Length > step) {
+            if (p.currentAction.move.Count > step) {
                 if (!nextPlayer.ContainsKey(p.currentAction.move[step]))
                     nextPlayer.Add(p.currentAction.move[step], p);
                 else {
@@ -50,7 +50,7 @@ public class TurnSolver {
         if (unmovablePlayers.Count > 0) {
             foreach (Player p in unmovablePlayers) {
                 p.Damage(4);
-                p.currentAction.move = new Cell[] {};
+                p.currentAction.move = new List<Cell>();
             }
             return false; // something would have gone wrong, should be corrected, but rerun just to be sure
         }
@@ -59,12 +59,8 @@ public class TurnSolver {
 
     private void CommitMovementStep(int step) {
         foreach (Player p in match.players) {
-            if (p.currentAction.move.Length > step) {
-                if (p.currentCell.currentUnit == p) // in case someone already moved in...
-                    p.currentCell.currentUnit = null; // don't kick them
-                p.currentCell = p.currentAction.move[step];
-                p.currentCell.currentUnit = p;
-                p.UseMP(1);
+            if (p.currentAction.move.Count > step) {
+                Map.MovePlayerToAdjacentCell(p, p.currentAction.move[step]);
             }
         }
     }

@@ -82,6 +82,7 @@ public class Match : MonoBehaviour {
 
     public void EndCurrentPlayerTurn() {
         matchController.OnTurnEnd();
+        foreach(Cell cell in map.cells) { cell.PutDefaultSkin(); }
         Player currentPlayer = players[playerTurn];
         /*
             TODO : retrieve player action and put them in a set to process the actions in the Solve phase
@@ -108,6 +109,12 @@ public class Match : MonoBehaviour {
     }
 
     private void EndSolvePhase() {
+        foreach (Player p in players) {
+            p.ClearTurnAction();
+            p.RegenMP(2);
+        }
+        phase = TurnPhase.Choice;
+        
         StartNewTurn();
     }
 }

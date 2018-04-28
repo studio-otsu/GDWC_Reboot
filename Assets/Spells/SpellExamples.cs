@@ -153,11 +153,11 @@ public class SpellDash : SpellBase {
         cooldownHeavy = 3;
     }
     public override IEnumerator SolveSpellLight(Player caster, Cell target, Map map) {
-        Map.MovePlayerToCell(caster,target);
+        Map.MovePlayerToAdjacentCell(caster,target);
         yield return null;
     }
     public override IEnumerator SolveSpellHeavy(Player caster, Cell target, Map map) {
-        Map.MovePlayerToCell(caster, target);
+        Map.MovePlayerToAdjacentCell(caster, target);
         yield return null;
     }
 }

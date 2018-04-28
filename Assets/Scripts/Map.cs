@@ -75,8 +75,15 @@ public class Map : MonoBehaviour {
      *  Static functions
      */
 
-    public static void MovePlayerToCell(Player player, Cell cell) {
-
+    public static void MovePlayerToAdjacentCell(Player player, Cell cell) {
+        if (!IsAdjacent(player.currentCell, cell)) throw new System.Exception("MovePlayerToCell : not adjacent");
+        if (player.currentCell.currentUnit == player) { // in case someone already moved in...
+            player.currentCell.currentUnit = null; // don't kick them
+        }
+        player.currentCell = cell;
+        cell.currentUnit = player;
+        player.UseMP(1);
+        player.transform.position = player.currentCell.transform.position;
     }
 
     public static void AddUnitToCell(Unit unit, Cell cell) {
@@ -97,6 +104,65 @@ public class Map : MonoBehaviour {
         if (SameCell(cell1, cell2)) throw new System.Exception("IsAdjacent : same position");
         int distance = Distance(cell1, cell2);
         return (distance == 1);
+    }
+
+    public List<Cell> ShortestPath(Cell start, Cell destination, int maxDistance = 30)
+    {
+        //BreadthFirstSearch
+        Queue<Cell> cells = new Queue<Cell>();
+        Dictionary<Cell, Cell> previousCell = new Dictionary<Cell, Cell>();
+        List<Cell> markedCells = new List<Cell>();
+        cells.Enqueue(start);
+        start.marked = true;
+        markedCells.Add(start);
+        while (cells.Count > 0)
+        {
+            Cell current = cells.Dequeue();
+            if (Map.Distance(start, current) <= maxDistance)
+            {              
+                AddNeighbor(current, RightCell(current), cells, markedCells, previousCell);
+                AddNeighbor(current, TopCell(current), cells, markedCells, previousCell);
+                AddNeighbor(current, LeftCell(current), cells, markedCells, previousCell);
+                AddNeighbor(current, BotCell(current), cells, markedCells, previousCell);
+            }
+        }
+
+        //Retrieve path from previousCells
+        List<Cell> path = null;
+        if (previousCell.ContainsKey(destination))
+        {
+            path = new List<Cell>();
+            Cell current = destination;            
+            while (current != start)
+            {
+                path.Add(current);
+                current = previousCell[current];
+            }
+            path.Reverse();            
+        }
+
+        //Clear
+        foreach(Cell cell in markedCells)
+        {
+            cell.marked = false;
+        }
+
+        return path;
+    }
+
+    private void AddNeighbor(Cell current, Cell neighbor,
+        Queue<Cell> cells, List<Cell> markedCells, Dictionary<Cell, Cell> previousCells)
+    {
+        if (neighbor != null
+            && !neighbor.marked
+            && neighbor.type == Cell.CellType.NORMAL)
+        {
+            cells.Enqueue(neighbor);
+            neighbor.marked = true;
+            markedCells.Add(neighbor);
+            previousCells.Add(neighbor, current);
+        }
+
     }
     
     public List<Cell> GetCellsCircle(Cell center, int max, int min = 0) {

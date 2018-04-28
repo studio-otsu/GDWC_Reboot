@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public struct TurnAction {
-	public Cell[] move;
+	public List<Cell> move;
     public TurnSpell spell;
     public Player player;
 }

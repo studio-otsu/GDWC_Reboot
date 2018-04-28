@@ -23,7 +23,9 @@ public class MatchController : MonoBehaviour {
     public void OnHoverCell(Cell c) {
     }
     public void OnClickEndTurn() {
-        match.EndTurn();
+        if (match.phase == Match.TurnPhase.Choice) {
+            match.EndTurn();
+        }
     }
 
     public Match match;
@@ -35,6 +37,7 @@ public class MatchController : MonoBehaviour {
     private List<Cell> selectedCells;
     private List<Cell> highlightedCells = new List<Cell>();
     private Cell hoveredCell;
+    private SpellBase selectedSpell;
 
 
     public void OnTurnStart(int turnNumber, int turnDuration, int playerId) {
@@ -73,13 +76,57 @@ public class MatchController : MonoBehaviour {
         turnTimer.text = "...";
     }
 
+    public void OnMouseDownCell(Cell cell)
+    {
+        if (match.phase == Match.TurnPhase.Choice)
+        {
+            if (selectedSpell == null)
+            {
+                //Do the move
+                AddMovementToPlayer(cell);
+                //currentPlayer.AddMovementToCell(cell);
+            }
+            else
+            {
+                //Target the spell
+            }
+        }
+    }
+
+    private void AddMovementToPlayer(Cell destinationCell)
+    {
+        Player currentPlayer = match.players[match.playerTurn];
+        //Check if the distance is not too big (doesn't check with obstacles)
+        if (Map.Distance(currentPlayer.currentCell, destinationCell) > currentPlayer.mpCurrent) return;
+        //Breadth first search
+        List<Cell> path = map.ShortestPath(currentPlayer.currentCell, destinationCell, currentPlayer.mpCurrent);
+        if (path != null)
+        {
+            currentPlayer.AddMoveToTurnAction(path);
+            HighlightMoveChosen(path);
+        }
+    }
+
+    private void HighlightMoveChosen(List<Cell> path)
+    {
+        foreach (Cell cell in path)
+        {
+            cell.PutChosenPathSkin();
+        }
+    }
+
     public void OnMouseEnterNewCell(Cell cell) {
-        ClearHighlightedCells();
-        hoveredCell = cell;
-        if (hoveredCell.currentUnit != null) {
-            Player hoveredPlayer = hoveredCell.currentUnit.GetComponent<Player>();
-            if (hoveredPlayer != null) {
-                DisplayMPRange(hoveredCell, hoveredPlayer.mpCurrent);
+        if (match.phase == Match.TurnPhase.Choice)
+        {
+            ClearHighlightedCells();
+            hoveredCell = cell;
+            if (hoveredCell.currentUnit != null)
+            {
+                Player hoveredPlayer = hoveredCell.currentUnit.GetComponent<Player>();
+                if (hoveredPlayer != null)
+                {
+                    DisplayMPRange(hoveredCell, hoveredPlayer.mpCurrent);
+                }
             }
         }
     }
@@ -89,7 +136,7 @@ public class MatchController : MonoBehaviour {
         cells.Enqueue(startingCell);
         while (cells.Count > 0) {
             Cell cellToProcess = cells.Dequeue();
-            if (Map.Distance(startingCell, cellToProcess) <= maxDistance) {
+            if (Map.Distance(startingCell, cellToProcess) < maxDistance) {
                 AddCellToHightlight(map.RightCell(cellToProcess), cells);
                 AddCellToHightlight(map.TopCell(cellToProcess), cells);
                 AddCellToHightlight(map.LeftCell(cellToProcess), cells);
@@ -98,17 +145,17 @@ public class MatchController : MonoBehaviour {
         }
 
         foreach (Cell cell in highlightedCells) {
-            cell.toHighlight = false;
+            cell.marked = false;
             cell.PutDisplayMPSkin();
         }
     }
 
     private void AddCellToHightlight(Cell cellToAdd, Queue<Cell> cells) {
         if (cellToAdd != null 
-            && !cellToAdd.toHighlight 
+            && !cellToAdd.marked 
             && cellToAdd.type == Cell.CellType.NORMAL) {
             cells.Enqueue(cellToAdd);
-            cellToAdd.toHighlight = true;
+            cellToAdd.marked = true;
             highlightedCells.Add(cellToAdd);
         }
     }

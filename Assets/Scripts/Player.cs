@@ -6,7 +6,7 @@ public class Player : Unit {
 
     public Player() {
         currentAction.player = this;
-        currentAction.move = new Cell[]{};
+        currentAction.move = new List<Cell>();
     }
 
     public TurnAction currentAction;
@@ -18,7 +18,7 @@ public class Player : Unit {
 
     public void RegenMP(int amount) {
         mpCurrent += amount;
-        if (mpCurrent < mpMax)
+        if (mpCurrent > mpMax)
             mpCurrent = mpMax;
     }
 
@@ -26,6 +26,17 @@ public class Player : Unit {
         mpCurrent -= amount;
         if (mpCurrent < 0)
             mpCurrent = 0;
+    }
+
+    public void AddMoveToTurnAction(List<Cell> path)
+    {
+        currentAction.move = path;
+    }
+
+    public void ClearTurnAction()
+    {
+        currentAction.player = this;
+        currentAction.move = new List<Cell>();
     }
 
 

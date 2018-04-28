@@ -6,7 +6,7 @@ using UnityEngine;
 public class Cell : MonoBehaviour
 {
     public Unit currentUnit;
-    public bool toHighlight = false;
+    public bool marked = false;
 
     public int x;
     public int y;
@@ -67,15 +67,25 @@ public class Cell : MonoBehaviour
         GetComponent<SpriteRenderer>().color = new Color(0.3f, 0.8f, 0.1f);
     }
 
+    public void PutChosenPathSkin()
+    {
+        GetComponent<SpriteRenderer>().color = new Color(0.2f, 0.4f, 0.9f);
+    }
+
     private void OnMouseEnter()
     {
         MatchController.instance.OnMouseEnterNewCell(this);
-        PutHoverSkin();
+        //PutHoverSkin();
     }
 
     private void OnMouseExit()
     {
-        PutDefaultSkin();
+        //PutDefaultSkin();
+    }
+
+    private void OnMouseDown()
+    {
+        MatchController.instance.OnMouseDownCell(this);
     }
 
 
