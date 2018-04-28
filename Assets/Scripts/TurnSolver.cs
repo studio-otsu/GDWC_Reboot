@@ -13,48 +13,69 @@ public class TurnSolver {
     public IEnumerator DoSolveMovements() {
         isSolvingMovements = true;
         for (int i = 0; i < 5; ++i) {
-            int iteration = 0;
-            while (!TryMovementStep(i)) {
-                iteration++;
-                if (iteration > 2)
-                    throw new System.Exception("Possible infinite loop. sort that out you fool!");
-            }
+            if (!TryMovementStep(i))
+                    throw new System.Exception("something went wrong. sort that out you fool!");
             CommitMovementStep(i);
             yield return new WaitForSeconds(0.25f);
         }
         isSolvingMovements = false;
     }
 
+    private struct Step {
+        public Cell from;
+        public Cell to;
+        public Player p;
+        public bool canceled;
+    }
+
+    private bool Collide(Step a, Step b) {
+        if (a.to == b.to) return true; // going to the same place
+        if (a.to != a.from && b.to != b.from) { // both moving
+            if (a.to == b.from && b.to == a.from) return true; // crossing
+        }
+        return false;
+    }
+
     private bool TryMovementStep(int step) {
-        Dictionary<Cell, Player> nextPlayer = new Dictionary<Cell, Player>();
-        List<Player> unmovablePlayers = new List<Player>();
-        foreach (Player p in match.players) {
-            if (p.currentAction.move.Count > step) {
-                if (!nextPlayer.ContainsKey(p.currentAction.move[step]))
-                    nextPlayer.Add(p.currentAction.move[step], p);
-                else {
-                    unmovablePlayers.Add(p);
-                    if (!unmovablePlayers.Contains(nextPlayer[p.currentAction.move[step]]))
-                        unmovablePlayers.Add(nextPlayer[p.currentAction.move[step]]);
+        List<Step> steps = new List<Step>();
+        bool verified = false;
+        int iterations = 0;
+        while (!verified) {
+            if (iterations > match.players.Count)
+                return false; // justto be sure...
+            iterations++;
+            steps.Clear();
+            verified = true; // if nothing goes wrong, we'll stop after this iteration
+            foreach (Player p in match.players) {
+                if (p.currentAction.move.Count > step) {
+                    steps.Add(new Step() { from = p.currentCell, to = p.currentAction.move[step], p = p });
+                } else {
+                    steps.Add(new Step() { from = p.currentCell, to = p.currentCell, p = p });
                 }
-            } else {
-                if (!nextPlayer.ContainsKey(p.currentCell))
-                    nextPlayer.Add(p.currentCell, p);
-                else {
-                    unmovablePlayers.Add(p);
-                    if (!unmovablePlayers.Contains(nextPlayer[p.currentCell]))
-                        unmovablePlayers.Add(nextPlayer[p.currentCell]);
+            }
+            for (int i = 0; i < steps.Count; ++i) {
+                Step a = steps[i];
+                for (int j = i+1; j < steps.Count; ++j) {
+                    Step b = steps[j];
+                    if (Collide(a, b)) { // DAMN SON
+                        a.p.Damage(4);
+                        if (a.to != a.from) { // if player was moving
+                            a.p.currentAction.move.Clear();
+                            //a.p.currentAction.spell.spell = a.p.currentAction.spell.target = null; // cancel spell?
+                        }
+                        b.p.Damage(4);
+                        if (b.to != b.from) { // if player was moving
+                            b.p.currentAction.move.Clear();
+                            //b.p.currentAction.spell.spell = b.p.currentAction.spell.target = null; // cancel spell?
+                        }
+                        verified = false; // still need verifications
+                        i = steps.Count; // cancel remaining verifications
+                        break; // outa here
+                    }
                 }
             }
         }
-        if (unmovablePlayers.Count > 0) {
-            foreach (Player p in unmovablePlayers) {
-                p.Damage(4);
-                p.currentAction.move = new List<Cell>();
-            }
-            return false; // something would have gone wrong, should be corrected, but rerun just to be sure
-        }
-        return true; // nothing should go wrong, commit step
+        return true;
     }
 
     private void CommitMovementStep(int step) {
@@ -71,7 +92,7 @@ public class TurnSolver {
         isSolvingSpells = true;
         foreach (Player p in match.players) {
             if (p.currentAction.spell.spell != null) {
-                if(match.currentTurn%2 ==0)
+                if (match.currentTurn % 2 == 0)
                     match.StartCoroutine(p.currentAction.spell.spell.SolveSpellHeavy(p, p.currentAction.spell.target, map));
                 else
                     match.StartCoroutine(p.currentAction.spell.spell.SolveSpellLight(p, p.currentAction.spell.target, map));

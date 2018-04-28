@@ -46,6 +46,7 @@ public class MatchController : MonoBehaviour {
         }
     }
 
+    #region SPELLS
     public void OnHoverSpellStart(int spell) {
         if (state > ControllerState.Solving) { // ignore hovering during solving phase
             AreaProfile range;
@@ -70,11 +71,11 @@ public class MatchController : MonoBehaviour {
             spellRangeCells.Clear();
         }
     }
-
     public void OnClickSpell(int spell) {
         if (state > ControllerState.Solving) { // ignore click during solving phase
         }
     }
+    #endregion // SPELLS
 
     public Match match;
     public Map map;
@@ -87,7 +88,7 @@ public class MatchController : MonoBehaviour {
     private Cell hoveredCell;
     private SpellBase selectedSpell;
 
-
+    #region TURN
     public void OnTurnStart(int turnNumber, int turnDuration, int playerId) {
         foreach(PlayerPanel pp in playerPanels) {
             pp.UpdateInterface();
@@ -98,20 +99,18 @@ public class MatchController : MonoBehaviour {
         turnPlayer.text = "Player " + playerId;
         StartTurnTimer(turnDuration);
     }
-
     public void OnTurnEnd() {
         StopTurnTimer();
     }
+    #endregion // TURN
 
-
+    #region TIMER
     public void StartTurnTimer(int turnDuration) {
         if (turnTimerCoroutine != null)
             StopCoroutine(turnTimerCoroutine);
         turnTimerCoroutine = StartCoroutine(DoTurnTimer(turnDuration));
     }
-
     private Coroutine turnTimerCoroutine = null;
-
     private IEnumerator DoTurnTimer(int turnDuration) {
         while (turnDuration >= 0) {
             turnTimer.text = "" + turnDuration;
@@ -121,14 +120,13 @@ public class MatchController : MonoBehaviour {
         turnTimerCoroutine = null;
         OnClickEndTurn();
     }
-
     public void StopTurnTimer() {
         if (turnTimerCoroutine != null)
             StopCoroutine(turnTimerCoroutine);
         turnTimerCoroutine = null;
         turnTimer.text = "...";
     }
-
+    #endregion // TIMER
     public void OnMouseDownCell(Cell cell)
     {
         if (match.phase == Match.TurnPhase.Choice)
