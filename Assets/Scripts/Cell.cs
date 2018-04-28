@@ -62,7 +62,7 @@ public class Cell : MonoBehaviour
         }
     }
 
-    public void PutDisplayMPSkin()
+    public void PutMoveSkin()
     {
         GetComponent<SpriteRenderer>().color = new Color(0.3f, 0.8f, 0.1f);
     }

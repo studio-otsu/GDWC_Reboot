@@ -41,7 +41,7 @@ public class Player : Unit {
     }
 
     public void AddMoveToTurnAction(List<Cell> path) {
-        currentAction.move = path;
+        currentAction.move = new List<Cell>(path);
     }
 
     public void ClearTurnAction() {

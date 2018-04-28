@@ -86,6 +86,7 @@ public class MatchController : MonoBehaviour {
     private List<Cell> hoveredCells;
     private List<Cell> selectedCells;
     private List<Cell> highlightedCells = new List<Cell>();
+    private List<Cell> chosenPathCells = new List<Cell>();
     private Cell hoveredCell;
     private SpellBase selectedSpell;
 
@@ -105,6 +106,7 @@ public class MatchController : MonoBehaviour {
         foreach (PlayerPanel pp in playerPanels) {
             pp.SetPanelInteractable(false); // dissable all panels
         }
+        ClearAllCells();
         StopTurnTimer();
         endTurn.interactable = false;
     }
@@ -141,6 +143,7 @@ public class MatchController : MonoBehaviour {
             if (selectedSpell == null)
             {
                 //Do the move
+                ClearChosenPathCells();
                 AddMovementToPlayer(cell);
                 //currentPlayer.AddMovementToCell(cell);
             }
@@ -151,8 +154,7 @@ public class MatchController : MonoBehaviour {
         }
     }
 
-    private void AddMovementToPlayer(Cell destinationCell)
-    {
+    private void AddMovementToPlayer(Cell destinationCell) {        
         Player currentPlayer = match.players[match.playerTurn];
         //Check if the distance is not too big (doesn't check with obstacles)
         if (Map.Distance(currentPlayer.currentCell, destinationCell) > currentPlayer.mpCurrent) return;
@@ -161,6 +163,7 @@ public class MatchController : MonoBehaviour {
         if (path != null)
         {
             currentPlayer.AddMoveToTurnAction(path);
+            chosenPathCells = path;
             HighlightMoveChosen(path);
         }
     }
@@ -186,14 +189,37 @@ public class MatchController : MonoBehaviour {
                     DisplayMPRange(hoveredCell, hoveredPlayer.mpCurrent);
                 }
             }
+            else
+            {
+                DisplayMovePrediction(hoveredCell);
+            }
         }
     }
 
     private void DisplayMPRange(Cell startingCell, int maxDistance) {
         highlightedCells = map.BreadthFirstSearch(startingCell, maxDistance);
         foreach (Cell c in highlightedCells) {
-            c.PutDisplayMPSkin();
+            c.PutMoveSkin();
         }
+    }
+
+    private void DisplayMovePrediction(Cell destinationCell) {
+        Player currentPlayer = match.players[match.playerTurn];
+        List<Cell> path = map.ShortestPath(currentPlayer.currentCell, destinationCell, currentPlayer.mpCurrent);
+        if (path != null) {
+            highlightedCells = path;
+            foreach (Cell c in highlightedCells) {
+                c.PutMoveSkin();
+            }
+        }
+    }
+
+    private void ClearAllCells() {
+        foreach (Cell cell in map.cells) {
+            cell.PutDefaultSkin();
+        }
+        highlightedCells.Clear();
+        chosenPathCells.Clear();
     }
 
     private void ClearHighlightedCells() {
@@ -201,6 +227,17 @@ public class MatchController : MonoBehaviour {
             cell.PutDefaultSkin();
         }
         highlightedCells.Clear();
+        foreach (Cell cell in chosenPathCells) {
+            cell.PutChosenPathSkin();
+        }
+    }
+
+    private void ClearChosenPathCells() {
+        Debug.Log("cleared");
+        foreach(Cell cell in chosenPathCells) {
+            cell.PutDefaultSkin();
+        }
+        chosenPathCells.Clear();
     }
 }
 
