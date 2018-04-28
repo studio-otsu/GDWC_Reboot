@@ -99,17 +99,10 @@ public class Map : MonoBehaviour {
         return (distance == 1);
     }
 
-    public static int Max(int a, int b) {
-        return a > b ? a : b;
-    }
-    public static int Min(int a, int b) {
-        return a < b ? a : b;
-    }
-
     public List<Cell> GetCellsCircle(Cell center, int max, int min = 0) {
         List<Cell> output = new List<Cell>();
-        for (int y = Max(0,center.y-max); y < Max(height, center.y + max); y++) {
-            for (int x = Max(0, center.x - max); x < Max(width, center.x + max); x++) {
+        for (int y = Mathf.Max(0,center.y-max); y < Mathf.Min(height, center.y + max); y++) {
+            for (int x = Mathf.Max(0, center.x - max); x < Mathf.Min(width, center.x + max); x++) {
                 Cell c = GetCell(x, y);
                 if(c != null) {
                     int distance = Distance(center, c);
@@ -123,20 +116,14 @@ public class Map : MonoBehaviour {
     }
 
     public List<Cell> GetCellsCross(Cell center, int max, int min = 0) {
-        List<Cell> output = GetCellsVerticalLine(center, max, min);
-        output.AddRange(GetCellsHorizontalLine(center, max, min));
-        return output;
+        return new List<Cell>(GetCellsVerticalLine(center, max, min).Union(GetCellsHorizontalLine(center, max, min)));
     }
 
     public List<Cell> GetCellsVerticalLine(Cell center, int max, int min = 0) {
-        List<Cell> output = GetCellsTopLine(center, max, min);
-        output.AddRange(GetCellsBottomLine(center, max, min));
-        return output;
+        return new List<Cell>(GetCellsTopLine(center, max, min).Union(GetCellsBottomLine(center, max, min)));
     }
     public List<Cell> GetCellsHorizontalLine(Cell center, int max, int min = 0) {
-        List<Cell> output = GetCellsLeftLine(center, max, min);
-        output.AddRange(GetCellsRightLine(center, max, min));
-        return output;
+        return new List<Cell>(GetCellsLeftLine(center, max, min).Union(GetCellsRightLine(center, max, min)));
     }
 
     public List<Cell> GetCellsTopLine(Cell center, int max, int min = 0) {
