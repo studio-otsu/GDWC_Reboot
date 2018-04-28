@@ -10,8 +10,8 @@ public class Player : Unit {
         spells = new PlayerSpell[]{
             new PlayerSpell() { spell = new SpellAttackMelee() },
             new PlayerSpell() { spell = new SpellAttackLarge() },
-            new PlayerSpell() { spell = new SpellDash(),cooldown = 1 },
-            new PlayerSpell() { spell = new SpellHeal(),cooldown = 2 }};
+            new PlayerSpell() { spell = new SpellDash() },
+            new PlayerSpell() { spell = new SpellHeal() }};
     }
 
     public TurnAction currentAction;
@@ -47,6 +47,8 @@ public class Player : Unit {
     public void ClearTurnAction() {
         currentAction.player = this;
         currentAction.move = new List<Cell>();
+        currentAction.spell.spell = null;
+        currentAction.spell.target = null;
     }
 
 

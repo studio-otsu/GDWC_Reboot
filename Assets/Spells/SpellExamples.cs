@@ -8,17 +8,17 @@ public class SpellAttackMelee : SpellBase {
         name = "Corps à corps";
         description = "Inflige 20 dégâts sur une ligne perpendiculaire de 1 case / Inflige 30 dégâts sur une ligne perpendiculaire de 1 case.";
         iconPath = "Sprites/Spells/bleeding-wound";
-        rangeLight = new AreaProfile(AreaType.Cross, 1, 1);
-        rangeHeavy = new AreaProfile(AreaType.Cross, 1, 1);
-        cooldownLight = 0;
-        cooldownHeavy = 0;
+        rangeLight = new AreaProfile(AreaType.Circle, 1, 1);
+        rangeHeavy = new AreaProfile(AreaType.Circle, 1, 1);
+        cooldownLight = 1;
+        cooldownHeavy = 1;
     }
     public override IEnumerator SolveSpellLight(Player caster, Cell target, Map map) {
         runningSpells++;
         List<Cell> affectedCells = null;
         if (caster.currentCell.x != target.x) { // attack left or right
             affectedCells = map.GetCellsVerticalLine(target, 0, 1);
-        } else if (caster.currentCell.x != target.x) { // attack up or down
+        } else if (caster.currentCell.y != target.y) { // attack up or down
             affectedCells = map.GetCellsHorizontalLine(target, 0, 1);
         } else throw new System.Exception("Can't aim at the caster cell!");
         foreach (Cell c in affectedCells) {
@@ -36,7 +36,7 @@ public class SpellAttackMelee : SpellBase {
         List<Cell> affectedCells = null;
         if (caster.currentCell.x != target.x) { // attack left or right
             affectedCells = map.GetCellsVerticalLine(target, 0, 1);
-        } else if (caster.currentCell.x != target.x) { // attack up or down
+        } else if (caster.currentCell.y != target.y) { // attack up or down
             affectedCells = map.GetCellsHorizontalLine(target, 0, 1);
         } else throw new System.Exception("Can't aim at the caster cell!");
         foreach (Cell c in affectedCells) {
@@ -58,8 +58,8 @@ public class SpellAttackShort : SpellBase {
         iconPath = "Sprites/Spells/ice-spear";
         rangeLight = new AreaProfile(AreaType.Circle, 1, 4);
         rangeHeavy = new AreaProfile(AreaType.Circle, 1, 4);
-        cooldownLight = 0;
-        cooldownHeavy = 0;
+        cooldownLight = 2;
+        cooldownHeavy = 2;
     }
     public override IEnumerator SolveSpellLight(Player caster, Cell target, Map map) {
         runningSpells++;
@@ -95,8 +95,8 @@ public class SpellAttackLarge : SpellBase {
         iconPath = "Sprites/Spells/shatter";
         rangeLight = new AreaProfile(AreaType.Circle, 2, 4);
         rangeHeavy = new AreaProfile(AreaType.Circle, 2, 4);
-        cooldownLight = 1;
-        cooldownHeavy = 1;
+        cooldownLight = 2;
+        cooldownHeavy = 2;
     }
     public override IEnumerator SolveSpellLight(Player caster, Cell target, Map map) {
         runningSpells++;
@@ -132,8 +132,8 @@ public class SpellAttackLong : SpellBase {
         iconPath = "Sprites/Spells/spark";
         rangeLight = new AreaProfile(AreaType.Circle, 4, 7);
         rangeHeavy = new AreaProfile(AreaType.Circle, 4, 7);
-        cooldownLight = 1;
-        cooldownHeavy = 1;
+        cooldownLight = 2;
+        cooldownHeavy = 2;
     }
     public override IEnumerator SolveSpellLight(Player caster, Cell target, Map map) {
         runningSpells++;
@@ -170,18 +170,18 @@ public class SpellDash : SpellBase {
         iconPath = "Sprites/Spells/fire-dash";
         rangeLight = new AreaProfile(AreaType.Cross, 2, 2);
         rangeHeavy = new AreaProfile(AreaType.Cross, 3, 3);
-        cooldownLight = 3;
-        cooldownHeavy = 3;
+        cooldownLight = 4;
+        cooldownHeavy = 4;
     }
     public override IEnumerator SolveSpellLight(Player caster, Cell target, Map map) {
         runningSpells++;
-        Map.MovePlayerToAdjacentCell(caster,target);
+        //Map.MovePlayerToAdjacentCell(caster,target);
         runningSpells--;
         yield return null;
     }
     public override IEnumerator SolveSpellHeavy(Player caster, Cell target, Map map) {
         runningSpells++;
-        Map.MovePlayerToAdjacentCell(caster, target);
+        //Map.MovePlayerToAdjacentCell(caster, target);
         runningSpells--;
         yield return null;
     }
@@ -193,8 +193,8 @@ public class SpellHeal : SpellBase {
         iconPath = "Sprites/Spells/regeneration";
         rangeLight = new AreaProfile(AreaType.Circle, 0, 0);
         rangeHeavy = new AreaProfile(AreaType.Circle, 0, 0);
-        cooldownLight = 3;
-        cooldownHeavy = 3;
+        cooldownLight = 4;
+        cooldownHeavy = 4;
     }
     public override IEnumerator SolveSpellLight(Player caster, Cell target, Map map) {
         runningSpells++;

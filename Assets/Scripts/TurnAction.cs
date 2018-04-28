@@ -9,6 +9,6 @@ public struct TurnAction {
 }
 
 public struct TurnSpell {
-    public SpellBase spell;
+    public PlayerSpell spell;
     public Cell target;
 }

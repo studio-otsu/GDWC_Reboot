@@ -28,6 +28,8 @@ public class Map : MonoBehaviour {
     }
 
     public Cell GetCell(int x, int y) {
+        if (x < 0 || x >= width || y < 0 || y >= height)
+            return null;
         return cells[CellIndex(x, y)];
     }
 
@@ -35,37 +37,29 @@ public class Map : MonoBehaviour {
         return cells[index];
     }
 
-    public Cell TopCell(Cell cell)
-    {
-        if (cell.y > 0)
-        {
+    public Cell TopCell(Cell cell) {
+        if (cell.y > 0) {
             return GetCell(cell.x, cell.y - 1);
         }
         return null;
     }
 
-    public Cell BotCell(Cell cell)
-    {
-        if (cell.y < height - 1)
-        {
+    public Cell BotCell(Cell cell) {
+        if (cell.y < height - 1) {
             return GetCell(cell.x, cell.y + 1);
         }
         return null;
     }
 
-    public Cell LeftCell(Cell cell)
-    {
-        if (cell.x > 0)
-        {
+    public Cell LeftCell(Cell cell) {
+        if (cell.x > 0) {
             return GetCell(cell.x - 1, cell.y);
         }
         return null;
     }
 
-    public Cell RightCell(Cell cell)
-    {
-        if (cell.x < width - 1)
-        {
+    public Cell RightCell(Cell cell) {
+        if (cell.x < width - 1) {
             return GetCell(cell.x + 1, cell.y);
         }
         return null;
@@ -99,15 +93,13 @@ public class Map : MonoBehaviour {
         return cell1 == cell2 || cell1.x == cell2.x && cell1.y == cell2.y;
     }
 
-    public static bool IsAdjacent(Cell cell1, Cell cell2)
-    {
+    public static bool IsAdjacent(Cell cell1, Cell cell2) {
         if (SameCell(cell1, cell2)) throw new System.Exception("IsAdjacent : same position");
         int distance = Distance(cell1, cell2);
         return (distance == 1);
     }
 
-    public List<Cell> ShortestPath(Cell start, Cell destination, int maxDistance = 30)
-    {
+    public List<Cell> ShortestPath(Cell start, Cell destination, int maxDistance = 30) {
         //BreadthFirstSearch
         Queue<Cell> cells = new Queue<Cell>();
         Dictionary<Cell, Cell> previousCell = new Dictionary<Cell, Cell>();
@@ -115,11 +107,9 @@ public class Map : MonoBehaviour {
         cells.Enqueue(start);
         start.marked = true;
         markedCells.Add(start);
-        while (cells.Count > 0)
-        {
+        while (cells.Count > 0) {
             Cell current = cells.Dequeue();
-            if (Map.Distance(start, current) <= maxDistance)
-            {              
+            if (Map.Distance(start, current) <= maxDistance) {
                 AddNeighbor(current, RightCell(current), cells, markedCells, previousCell);
                 AddNeighbor(current, TopCell(current), cells, markedCells, previousCell);
                 AddNeighbor(current, LeftCell(current), cells, markedCells, previousCell);
@@ -129,21 +119,18 @@ public class Map : MonoBehaviour {
 
         //Retrieve path from previousCells
         List<Cell> path = null;
-        if (previousCell.ContainsKey(destination))
-        {
+        if (previousCell.ContainsKey(destination)) {
             path = new List<Cell>();
-            Cell current = destination;            
-            while (current != start)
-            {
+            Cell current = destination;
+            while (current != start) {
                 path.Add(current);
                 current = previousCell[current];
             }
-            path.Reverse();            
+            path.Reverse();
         }
 
         //Clear
-        foreach(Cell cell in markedCells)
-        {
+        foreach (Cell cell in markedCells) {
             cell.marked = false;
         }
 
@@ -151,12 +138,10 @@ public class Map : MonoBehaviour {
     }
 
     private void AddNeighbor(Cell current, Cell neighbor,
-        Queue<Cell> cells, List<Cell> markedCells, Dictionary<Cell, Cell> previousCells)
-    {
+        Queue<Cell> cells, List<Cell> markedCells, Dictionary<Cell, Cell> previousCells) {
         if (neighbor != null
             && !neighbor.marked
-            && neighbor.type == Cell.CellType.NORMAL)
-        {
+            && neighbor.type == Cell.CellType.NORMAL) {
             cells.Enqueue(neighbor);
             neighbor.marked = true;
             markedCells.Add(neighbor);
@@ -164,15 +149,24 @@ public class Map : MonoBehaviour {
         }
 
     }
-    
+
+    public List<Cell> GetCellsArea(Cell center, AreaProfile area) {
+        switch (area.type) {
+            case AreaType.Cross:
+                return GetCellsCross(center, area.max, area.min);
+            default:
+                return GetCellsCircle(center, area.max, area.min);
+        }
+    }
+
     public List<Cell> GetCellsCircle(Cell center, int max, int min = 0) {
         List<Cell> output = new List<Cell>();
-        for (int y = Mathf.Max(0,center.y-max); y < Mathf.Min(height, center.y + max); y++) {
-            for (int x = Mathf.Max(0, center.x - max); x < Mathf.Min(width, center.x + max); x++) {
+        for (int y = Mathf.Max(0, center.y - Mathf.Max(min, max)); y <= Mathf.Min(height, center.y + Mathf.Max(min, max)); y++) {
+            for (int x = Mathf.Max(0, center.x - Mathf.Max(min, max)); x <= Mathf.Min(width, center.x + Mathf.Max(min, max)); x++) {
                 Cell c = GetCell(x, y);
-                if(c != null) {
+                if (c != null) {
                     int distance = Distance(center, c);
-                    if (distance >= min && distance <= max) {
+                    if (distance >= Mathf.Min(min, max) && distance <= Mathf.Max(min, max)) {
                         output.Add(c);
                     }
                 }
@@ -194,33 +188,37 @@ public class Map : MonoBehaviour {
 
     public List<Cell> GetCellsTopLine(Cell center, int max, int min = 0) {
         List<Cell> output = new List<Cell>();
-        for (int i = min; i < max; ++i) {
-            if (center.y - i >= 0)
-                output.Add(GetCell(center.x, center.y - i));
+        for (int i = Mathf.Min(min, max); i <= Mathf.Max(min, max); ++i) {
+            Cell c = GetCell(center.x, center.y - i);
+            if (c != null)
+                output.Add(c);
         }
         return output;
     }
     public List<Cell> GetCellsBottomLine(Cell center, int max, int min = 0) {
         List<Cell> output = new List<Cell>();
-        for (int i = min; i < max; ++i) {
-            if (center.y + i < height)
-                output.Add(GetCell(center.x, center.y + i));
+        for (int i = Mathf.Min(min, max); i <= Mathf.Max(min, max); ++i) {
+            Cell c = GetCell(center.x, center.y + i);
+            if (c != null)
+                output.Add(c);
         }
         return output;
     }
     public List<Cell> GetCellsLeftLine(Cell center, int max, int min = 0) {
         List<Cell> output = new List<Cell>();
-        for (int i = min; i < max; ++i) {
-            if (center.x - i >= 0)
-                output.Add(GetCell(center.x - 1, center.y));
+        for (int i = Mathf.Min(min, max); i <= Mathf.Max(min, max); ++i) {
+            Cell c = GetCell(center.x - i, center.y);
+            if (c != null)
+                output.Add(c);
         }
         return output;
     }
     public List<Cell> GetCellsRightLine(Cell center, int max, int min = 0) {
         List<Cell> output = new List<Cell>();
-        for (int i = min; i < max; ++i) {
-            if (center.x + i < width)
-                output.Add(GetCell(center.x + 1, center.y));
+        for (int i = Mathf.Min(min, max); i <= Mathf.Max(min, max); ++i) {
+            Cell c = GetCell(center.x + i, center.y);
+            if (c != null)
+                output.Add(c);
         }
         return output;
     }

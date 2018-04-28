@@ -53,10 +53,8 @@ public class PlayerPanel : MonoBehaviour {
             if (player.spells[i].isRecharging) {
                 spells[i].spellText.text = "" + player.spells[i].cooldown;
                 spells[i].spellText.enabled = true;
-                spells[i].spellButton.interactable = false;
             } else {
                 spells[i].spellText.enabled = false;
-                spells[i].spellButton.interactable = true;
             }
         }
     }

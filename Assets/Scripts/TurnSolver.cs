@@ -14,7 +14,7 @@ public class TurnSolver {
         isSolvingMovements = true;
         for (int i = 0; i < 5; ++i) {
             if (!TryMovementStep(i))
-                    throw new System.Exception("something went wrong. sort that out you fool!");
+                throw new System.Exception("something went wrong. sort that out you fool!");
             CommitMovementStep(i);
             yield return new WaitForSeconds(0.25f);
         }
@@ -25,7 +25,6 @@ public class TurnSolver {
         public Cell from;
         public Cell to;
         public Player p;
-        public bool canceled;
     }
 
     private bool Collide(Step a, Step b) {
@@ -55,7 +54,7 @@ public class TurnSolver {
             }
             for (int i = 0; i < steps.Count; ++i) {
                 Step a = steps[i];
-                for (int j = i+1; j < steps.Count; ++j) {
+                for (int j = i + 1; j < steps.Count; ++j) {
                     Step b = steps[j];
                     if (Collide(a, b)) { // DAMN SON
                         a.p.Damage(4);
@@ -91,11 +90,15 @@ public class TurnSolver {
     public IEnumerator DoSolveSpells() {
         isSolvingSpells = true;
         foreach (Player p in match.players) {
-            if (p.currentAction.spell.spell != null) {
-                if (match.currentTurn % 2 == 0)
-                    match.StartCoroutine(p.currentAction.spell.spell.SolveSpellHeavy(p, p.currentAction.spell.target, map));
-                else
-                    match.StartCoroutine(p.currentAction.spell.spell.SolveSpellLight(p, p.currentAction.spell.target, map));
+            if (p.currentAction.spell.spell != null && p.currentAction.spell.target != null && !p.currentAction.spell.spell.isRecharging) {
+                if (match.currentTurn % 2 == 0) {
+                    match.StartCoroutine(p.currentAction.spell.spell.spell.SolveSpellHeavy(p, p.currentAction.spell.target, map));
+                    p.currentAction.spell.spell.StartCooldownHeavy();
+                } else {
+                    match.StartCoroutine(p.currentAction.spell.spell.spell.SolveSpellLight(p, p.currentAction.spell.target, map));
+                    p.currentAction.spell.spell.StartCooldownLight();
+                }
+                //Debug.Log("Using " + p.currentAction.spell.spell.spell.name + " spell!");
             }
         }
         yield return new WaitUntil(delegate { return SpellBase.runningSpells == 0; });

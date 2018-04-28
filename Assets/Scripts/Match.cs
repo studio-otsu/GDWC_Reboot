@@ -72,11 +72,28 @@ public class Match : MonoBehaviour {
 
     private void StartNewTurn() {
         playerTurn = (playerTurn + 1) % players.Count;
-        currentTurn += playerTurn == 0 ? 1 : 0;
-        foreach (Player p in players) {
-            if (currentTurn % 2 == 0)
-                p.RegenMP(2);
-            p.UpdateCooldown();
+        if (playerTurn == 0) { // heavy turn
+            currentTurn++;
+            foreach (Player p in players) {
+                if (currentTurn % 2 == 0)
+                    p.RegenMP(2);
+                p.UpdateCooldown();
+                // pseudo IA
+                int move = Random.Range(0, 4 - 1);
+                int x = move == 1 ? -1 : move == 3 ? 1 : 0;
+                int y = move == 0 ? -1 : move == 2 ? 1 : 0;
+                Cell dest = map.GetCell(p.currentCell.x + x, p.currentCell.y + y);
+                if (dest != null && dest.type == Cell.CellType.NORMAL && dest)
+                    p.currentAction.move.Add(dest);
+                else
+                    dest = p.currentCell;
+                PlayerSpell s = p.spells[currentTurn%4];
+                List<Cell> range = map.GetCellsArea(dest, currentTurn % 2 == 0 ? s.spell.rangeHeavy : s.spell.rangeLight);
+                if (range.Count > 0) {
+                    p.currentAction.spell.spell = s;
+                    p.currentAction.spell.target = range[Random.Range(0, range.Count - 1)];
+                }
+            }
         }
         matchController.OnTurnStart(currentTurn, 5, playerTurn);
     }
@@ -89,9 +106,6 @@ public class Match : MonoBehaviour {
         matchController.OnTurnEnd();
         foreach (Cell cell in map.cells) { cell.PutDefaultSkin(); }
         Player currentPlayer = players[playerTurn];
-        /*
-            TODO : retrieve player action and put them in a set to process the actions in the Solve phase
-         */
         if (playerTurn < (players.Count - 1)) {
             StartNewTurn();
         } else {
@@ -115,7 +129,6 @@ public class Match : MonoBehaviour {
     private void EndSolvePhase() {
         foreach (Player p in players) {
             p.ClearTurnAction();
-            p.RegenMP(2);
         }
         phase = TurnPhase.Choice;
 

@@ -98,9 +98,14 @@ public class MatchController : MonoBehaviour {
         turnCounter.text = "Turn " + turnNumber;
         turnPlayer.text = "Player " + playerId;
         StartTurnTimer(turnDuration);
+        endTurn.interactable = true;
     }
     public void OnTurnEnd() {
+        foreach (PlayerPanel pp in playerPanels) {
+            pp.SetPanelInteractable(false); // dissable all panels
+        }
         StopTurnTimer();
+        endTurn.interactable = false;
     }
     #endregion // TURN
 
@@ -127,6 +132,7 @@ public class MatchController : MonoBehaviour {
         turnTimer.text = "...";
     }
     #endregion // TIMER
+
     public void OnMouseDownCell(Cell cell)
     {
         if (match.phase == Match.TurnPhase.Choice)

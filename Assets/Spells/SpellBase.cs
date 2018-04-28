@@ -41,14 +41,14 @@ public class PlayerSpell {
     public SpellBase spell;
     public int cooldown;
 
-    public bool isRecharging {
-        get { return cooldown > 0; }
+    public void StartCooldownLight() {
+        cooldown = spell.cooldownLight;
+    }
+    public void StartCooldownHeavy() {
+        cooldown = spell.cooldownHeavy;
     }
 
-    public IEnumerator SolveSpellLight(Player caster, Cell target, Map map) {
-        return spell.SolveSpellLight(caster, target, map);
-    }
-    public IEnumerator SolveSpellHeavy(Player caster, Cell target, Map map) {
-        return spell.SolveSpellHeavy(caster, target, map);
+    public bool isRecharging {
+        get { return cooldown > 0; }
     }
 }
