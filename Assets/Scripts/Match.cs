@@ -8,8 +8,7 @@ public class Match : MonoBehaviour {
     public enum TurnPhase { Choice, Solve }
     public TurnPhase phase;
     public int playerTurn;
-
-    public InputController controller;
+    
     public MatchController matchController;
     public Map map;
     public TurnSolver solver;
@@ -56,9 +55,6 @@ public class Match : MonoBehaviour {
         Cell cell2 = output.map.startingBCells[0]; // player 2 start pos
         Map.AddUnitToCell(p2, cell2);
         p2.transform.position = cell2.transform.position;
-        // init input controller
-        //output.controller = new InputController(output);
-        //output.StartMatch();
         // other stuff
         output.solver = new TurnSolver();
         output.solver.match = output;
@@ -90,12 +86,6 @@ public class Match : MonoBehaviour {
         /*
             TODO : retrieve player action and put them in a set to process the actions in the Solve phase
          */
-        /*if (playerTurn < (players.Count - 1)) {
-            ++playerTurn;
-        }
-        else {
-            StartSolvePhase();
-        }*/
         if (playerTurn < (players.Count-1)) {
             StartNewTurn();
         } else {
@@ -119,11 +109,5 @@ public class Match : MonoBehaviour {
 
     private void EndSolvePhase() {
         StartNewTurn();
-    }
-
-    //For debugging
-    void OnGUI() {
-        //GUI.Label(new Rect(10,10,200,20), "Turn: " + currentTurn.ToString());
-        //GUI.Label(new Rect(10,30,200,20), "PlayerTurn: " + playerTurn.ToString());
     }
 }
