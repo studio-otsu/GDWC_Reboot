@@ -50,7 +50,7 @@ public class TurnSolver {
         if (unmovablePlayers.Count > 0) {
             foreach (Player p in unmovablePlayers) {
                 p.Damage(4);
-                p.currentAction.move = new Cell[] { p.currentCell };
+                p.currentAction.move = new Cell[] {};
             }
             return false; // something would have gone wrong, should be corrected, but rerun just to be sure
         }
