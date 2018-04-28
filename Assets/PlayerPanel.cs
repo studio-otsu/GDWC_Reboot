@@ -17,13 +17,19 @@ public class PlayerPanel : MonoBehaviour {
     private Player player;
     private MatchController controller;
 
+    private Color panelEnabledColor = new Color(0.75f, 0.75f, 0.75f, 1);
+    private Color panelDisabledColor = new Color(0.5f, 0.5f, 0.5f, 1);
+
     public void SetMatchController(MatchController controller) {
         this.controller = controller;
     }
     public void SetPlayer(Player player) {
         this.player = player;
+        playerNameText.text = player.name;
+        panelEnabledColor = player.team == Team.TeamA ? new Color(0, .8f, 0, 1) : new Color(.8f, 0, .8f, 1);
+        panelDisabledColor = player.team == Team.TeamA ? new Color(.2f, .4f, .2f, 1) : new Color(.4f, .3f, .4f, 1);
         for (int i = 0; i < 4; ++i) {
-            //spells[i].spellImage.sprite = Resources.Load<Sprite>(player.spells[i].iconPath);
+            spells[i].spellImage.sprite = Resources.Load<Sprite>(player.spells[i].spell.iconPath);
         }
     }
 
@@ -44,34 +50,35 @@ public class PlayerPanel : MonoBehaviour {
     }
     public void UpdateSpellBar() {
         for (int i = 0; i < 4; ++i) {
-            //if(player.spells[i].isRecharging) {
-            //    spells[i].spellText = player.spells[i].cooldown;
-            //    spells[i].spellText.enabled = true;
-            //    spells[i].spellButton.interactable = false;
-            //} else {
-            //    spells[i].spellText.enabled = false;
-            //    spells[i].spellButton.interactable = true;
-            //}
+            if (player.spells[i].isRecharging) {
+                spells[i].spellText.text = "" + player.spells[i].cooldown;
+                spells[i].spellText.enabled = true;
+                spells[i].spellButton.interactable = false;
+            } else {
+                spells[i].spellText.enabled = false;
+                spells[i].spellButton.interactable = true;
+            }
         }
     }
 
     public void SetPanelInteractable(bool value) {
+        GetComponent<Image>().color = value ? panelEnabledColor : panelDisabledColor;
         for (int i = 0; i < 4; ++i) {
-            //spells[i].spellButton.interactable = value && player.spells[i].isRecharging;
+            spells[i].spellButton.interactable = value && player.spells[i].isRecharging;
         }
     }
 
     public void ClickSpell0() {
-        //controller.spell0;
+        controller.OnClickSpell(0);
     }
     public void ClickSpell1() {
-        //controller.spell1;
+        controller.OnClickSpell(1);
     }
     public void ClickSpell2() {
-        //controller.spell2;
+        controller.OnClickSpell(2);
     }
     public void ClickSpell3() {
-        //controller.spell3;
+        controller.OnClickSpell(3);
     }
 }
 

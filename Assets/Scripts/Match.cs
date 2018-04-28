@@ -37,13 +37,13 @@ public class Match : MonoBehaviour {
         builder.GenerateMap(mapPath); // todo : fill in cell prefab
         // build players
         Player p1 = Instantiate(builder.playerPrefab, output.transform).GetComponent<Player>();
-        p1.name = "Player 1";
+        p1.name = "Player 0";
         p1.team = Team.TeamA;
         p1.teamColor = colorTeamA;
         output.teamA.Add(p1);
         output.players.Add(p1);
         Player p2 = Instantiate(builder.playerPrefab, output.transform).GetComponent<Player>();
-        p2.name = "Player 2";
+        p2.name = "Player 1";
         p2.team = Team.TeamB;
         p2.teamColor = colorTeamB;
         output.teamB.Add(p2);
@@ -73,6 +73,10 @@ public class Match : MonoBehaviour {
     private void StartNewTurn() {
         playerTurn = (playerTurn + 1) % players.Count;
         currentTurn += playerTurn == 0 ? 1 : 0;
+        if (currentTurn % 2 == 0) {
+            foreach (Player p in players)
+                p.RegenMP(2);
+        }
         matchController.OnTurnStart(currentTurn, 5, playerTurn);
     }
 
