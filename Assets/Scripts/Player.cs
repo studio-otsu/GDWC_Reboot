@@ -51,5 +51,11 @@ public class Player : Unit {
         currentAction.spell.target = null;
     }
 
+    public void ClearMovementAction() {
+        Debug.Log(currentAction.move);
+        currentAction.move = new List<Cell>();
+        Debug.Log(currentAction.move);
+    }
+
 
 }

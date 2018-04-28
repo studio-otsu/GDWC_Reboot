@@ -155,9 +155,7 @@ public class MatchController : MonoBehaviour {
     }
 
     private void AddMovementToPlayer(Cell destinationCell) {        
-        Player currentPlayer = match.players[match.playerTurn];
-        //Check if the distance is not too big (doesn't check with obstacles)
-        if (Map.Distance(currentPlayer.currentCell, destinationCell) > currentPlayer.mpCurrent) return;
+        Player currentPlayer = match.players[match.playerTurn];      
         //Breadth first search
         List<Cell> path = map.ShortestPath(currentPlayer.currentCell, destinationCell, currentPlayer.mpCurrent);
         if (path != null)
@@ -165,6 +163,10 @@ public class MatchController : MonoBehaviour {
             currentPlayer.AddMoveToTurnAction(path);
             chosenPathCells = path;
             HighlightMoveChosen(path);
+        }
+        else
+        {
+            currentPlayer.ClearMovementAction();
         }
     }
 
