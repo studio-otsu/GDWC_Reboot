@@ -64,7 +64,7 @@ public class PlayerPanel : MonoBehaviour {
     public void SetPanelInteractable(bool value) {
         GetComponent<Image>().color = value ? panelEnabledColor : panelDisabledColor;
         for (int i = 0; i < 4; ++i) {
-            spells[i].spellButton.interactable = value && player.spells[i].isRecharging;
+            spells[i].spellButton.interactable = value && !player.spells[i].isRecharging;
         }
     }
 

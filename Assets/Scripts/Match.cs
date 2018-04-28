@@ -8,7 +8,7 @@ public class Match : MonoBehaviour {
     public enum TurnPhase { Choice, Solve }
     public TurnPhase phase;
     public int playerTurn;
-    
+
     public MatchController matchController;
     public Map map;
     public TurnSolver solver;
@@ -66,16 +66,17 @@ public class Match : MonoBehaviour {
         //Init match turn
         currentTurn = 0;
         phase = TurnPhase.Choice;
-        playerTurn = players.Count-1;
+        playerTurn = players.Count - 1;
         StartNewTurn();
     }
 
     private void StartNewTurn() {
         playerTurn = (playerTurn + 1) % players.Count;
         currentTurn += playerTurn == 0 ? 1 : 0;
-        if (currentTurn % 2 == 0) {
-            foreach (Player p in players)
+        foreach (Player p in players) {
+            if (currentTurn % 2 == 0)
                 p.RegenMP(2);
+            p.UpdateCooldown();
         }
         matchController.OnTurnStart(currentTurn, 5, playerTurn);
     }
@@ -86,20 +87,19 @@ public class Match : MonoBehaviour {
 
     public void EndCurrentPlayerTurn() {
         matchController.OnTurnEnd();
-        foreach(Cell cell in map.cells) { cell.PutDefaultSkin(); }
+        foreach (Cell cell in map.cells) { cell.PutDefaultSkin(); }
         Player currentPlayer = players[playerTurn];
         /*
             TODO : retrieve player action and put them in a set to process the actions in the Solve phase
          */
-        if (playerTurn < (players.Count-1)) {
+        if (playerTurn < (players.Count - 1)) {
             StartNewTurn();
         } else {
             StartSolvePhase();
         }
     }
 
-    private void StartSolvePhase()
-    {
+    private void StartSolvePhase() {
         StartCoroutine(DoSolvePhase());
     }
 
@@ -118,7 +118,7 @@ public class Match : MonoBehaviour {
             p.RegenMP(2);
         }
         phase = TurnPhase.Choice;
-        
+
         StartNewTurn();
     }
 }

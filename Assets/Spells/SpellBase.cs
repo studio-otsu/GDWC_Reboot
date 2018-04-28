@@ -37,7 +37,7 @@ public struct AreaProfile {
     public int max;
 }
 
-public struct PlayerSpell {
+public class PlayerSpell {
     public SpellBase spell;
     public int cooldown;
 

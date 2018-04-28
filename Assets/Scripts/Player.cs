@@ -21,6 +21,13 @@ public class Player : Unit {
 
     public PlayerSpell[] spells;
 
+    public void UpdateCooldown() {
+        foreach (PlayerSpell spell in spells) {
+            if (spell.cooldown > 0)
+                spell.cooldown--;
+        }
+    }
+
     public void RegenMP(int amount) {
         mpCurrent += amount;
         if (mpCurrent > mpMax)
@@ -33,13 +40,11 @@ public class Player : Unit {
             mpCurrent = 0;
     }
 
-    public void AddMoveToTurnAction(List<Cell> path)
-    {
+    public void AddMoveToTurnAction(List<Cell> path) {
         currentAction.move = path;
     }
 
-    public void ClearTurnAction()
-    {
+    public void ClearTurnAction() {
         currentAction.player = this;
         currentAction.move = new List<Cell>();
     }
