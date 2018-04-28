@@ -101,21 +101,7 @@ public class Map : MonoBehaviour {
 
     public List<Cell> ShortestPath(Cell start, Cell destination, int maxDistance = 30) {
         //BreadthFirstSearch
-        Queue<Cell> cells = new Queue<Cell>();
-        Dictionary<Cell, Cell> previousCell = new Dictionary<Cell, Cell>();
-        List<Cell> markedCells = new List<Cell>();
-        cells.Enqueue(start);
-        start.marked = true;
-        markedCells.Add(start);
-        while (cells.Count > 0) {
-            Cell current = cells.Dequeue();
-            if (Map.Distance(start, current) <= maxDistance) {
-                AddNeighbor(current, RightCell(current), cells, markedCells, previousCell);
-                AddNeighbor(current, TopCell(current), cells, markedCells, previousCell);
-                AddNeighbor(current, LeftCell(current), cells, markedCells, previousCell);
-                AddNeighbor(current, BotCell(current), cells, markedCells, previousCell);
-            }
-        }
+        Dictionary<Cell, Cell> previousCell = BreadthFirstSearchPrevious(start, maxDistance);
 
         //Retrieve path from previousCells
         List<Cell> path = null;
@@ -128,13 +114,42 @@ public class Map : MonoBehaviour {
             }
             path.Reverse();
         }
+        return path;
+    }
+
+    public Dictionary<Cell, Cell> BreadthFirstSearchPrevious(Cell start, int maxDistance = 30)
+    {
+        Queue<Cell> cells = new Queue<Cell>();
+        Dictionary<Cell, Cell> previousCells = new Dictionary<Cell, Cell>();
+        List<Cell> markedCells = new List<Cell>();
+        cells.Enqueue(start);
+        start.marked = true;
+        markedCells.Add(start);
+        while (cells.Count > 0)
+        {
+            Cell current = cells.Dequeue();
+            if (Map.Distance(start, current) < maxDistance)
+            {
+                AddNeighbor(current, RightCell(current), cells, markedCells, previousCells);
+                AddNeighbor(current, TopCell(current), cells, markedCells, previousCells);
+                AddNeighbor(current, LeftCell(current), cells, markedCells, previousCells);
+                AddNeighbor(current, BotCell(current), cells, markedCells, previousCells);
+            }
+        }
 
         //Clear
-        foreach (Cell cell in markedCells) {
+        foreach (Cell cell in markedCells)
+        {
             cell.marked = false;
         }
 
-        return path;
+        return previousCells;
+    }
+
+    public List<Cell> BreadthFirstSearch(Cell start, int maxDistance = 30)
+    {
+        Dictionary<Cell, Cell> previousCells = BreadthFirstSearchPrevious(start, maxDistance);
+        return previousCells.Keys.ToList<Cell>();
     }
 
     private void AddNeighbor(Cell current, Cell neighbor,

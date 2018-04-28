@@ -189,31 +189,9 @@ public class MatchController : MonoBehaviour {
     }
 
     private void DisplayMPRange(Cell startingCell, int maxDistance) {
-        Queue<Cell> cells = new Queue<Cell>();
-        cells.Enqueue(startingCell);
-        while (cells.Count > 0) {
-            Cell cellToProcess = cells.Dequeue();
-            if (Map.Distance(startingCell, cellToProcess) < maxDistance) {
-                AddCellToHightlight(map.RightCell(cellToProcess), cells);
-                AddCellToHightlight(map.TopCell(cellToProcess), cells);
-                AddCellToHightlight(map.LeftCell(cellToProcess), cells);
-                AddCellToHightlight(map.BotCell(cellToProcess), cells);
-            }
-        }
-
-        foreach (Cell cell in highlightedCells) {
-            cell.marked = false;
-            cell.PutDisplayMPSkin();
-        }
-    }
-
-    private void AddCellToHightlight(Cell cellToAdd, Queue<Cell> cells) {
-        if (cellToAdd != null
-            && !cellToAdd.marked 
-            && cellToAdd.type == Cell.CellType.NORMAL) {
-            cells.Enqueue(cellToAdd);
-            cellToAdd.marked = true;
-            highlightedCells.Add(cellToAdd);
+        highlightedCells = map.BreadthFirstSearch(startingCell, maxDistance);
+        foreach (Cell c in highlightedCells) {
+            c.PutDisplayMPSkin();
         }
     }
 
