@@ -235,9 +235,8 @@ public class MatchController : MonoBehaviour {
     }
 
     private void ClearChosenPathCells() {
-        Debug.Log("cleared");
         foreach(Cell cell in chosenPathCells) {
-            cell.PutDefaultSkin();
+            if (!highlightedCells.Contains(cell)) { cell.PutDefaultSkin(); }
         }
         chosenPathCells.Clear();
     }

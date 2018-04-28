@@ -97,7 +97,7 @@ public class Match : MonoBehaviour {
                 }
             }
         }
-        matchController.OnTurnStart(currentTurn, 5, playerTurn);
+        matchController.OnTurnStart(currentTurn, 15, playerTurn);
     }
 
     public void EndTurn() {

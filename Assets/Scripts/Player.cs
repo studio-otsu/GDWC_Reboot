@@ -52,9 +52,7 @@ public class Player : Unit {
     }
 
     public void ClearMovementAction() {
-        Debug.Log(currentAction.move);
         currentAction.move = new List<Cell>();
-        Debug.Log(currentAction.move);
     }
 
 
