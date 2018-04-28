@@ -16,7 +16,25 @@ public class MatchController : MonoBehaviour {
     public Button endTurn;
     public Button[] spells;
 
+    public RectTransform playerPanelsTeamA;
+    public RectTransform playerPanelsTeamB;
+
+    public List<PlayerPanel> playerPanels = new List<PlayerPanel>();
+
     #endregion // GUI_ELEMENTS
+
+    public void InitializeInterface() {
+        foreach (Player p in match.players) {
+            PlayerPanel pp = Instantiate(Resources.Load<GameObject>("Prefabs/PlayerPanel"), p.team == Team.TeamA ? playerPanelsTeamA : playerPanelsTeamB).GetComponent<PlayerPanel>();
+            pp.SetPlayer(p);
+            pp.SetMatchController(this);
+            pp.UpdateInterface();
+            pp.SetPanelInteractable(false);
+            playerPanels.Add(pp);
+        }
+    }
+
+    private ControllerState state = ControllerState.Solving;
 
     public void OnClickCell(Cell c) {
     }
@@ -24,6 +42,36 @@ public class MatchController : MonoBehaviour {
     }
     public void OnClickEndTurn() {
         match.EndTurn();
+    }
+
+    public void OnHoverSpellStart(int spell) {
+        if (state > ControllerState.Solving) { // ignore hovering during solving phase
+            AreaProfile range;
+            if (match.currentTurn % 2 == 0)
+                range = match.player.spells[spell].spell.rangeHeavy;
+            else
+                range = match.player.spells[spell].spell.rangeLight;
+            switch (range.type) {
+                case AreaType.Circle:
+                    spellRangeCells.AddRange(map.GetCellsCircle(match.player.currentCell, range.max, range.min)); break;
+                case AreaType.Cross:
+                    spellRangeCells.AddRange(map.GetCellsCross(match.player.currentCell, range.max, range.min)); break;
+                default: break;
+            }
+            //do coloring
+        }
+    }
+    private List<Cell> spellRangeCells = new List<Cell>();
+    public void OnHoverSpellEnd() {
+        if (state > ControllerState.Solving) { // ignore hovering during solving phase
+            //1.undo color
+            spellRangeCells.Clear();
+        }
+    }
+
+    public void OnClickSpell(int spell) {
+        if (state > ControllerState.Solving) { // ignore click during solving phase
+        }
     }
 
     public Match match;
@@ -38,6 +86,11 @@ public class MatchController : MonoBehaviour {
 
 
     public void OnTurnStart(int turnNumber, int turnDuration, int playerId) {
+        foreach(PlayerPanel pp in playerPanels) {
+            pp.UpdateInterface();
+            pp.SetPanelInteractable(false); // dissable all panels
+        }
+        playerPanels[playerId].SetPanelInteractable(true); // enable current active player panel
         turnCounter.text = "Turn " + turnNumber;
         turnPlayer.text = "Player " + playerId;
         StartTurnTimer(turnDuration);
@@ -62,8 +115,8 @@ public class MatchController : MonoBehaviour {
             turnDuration--;
             yield return new WaitForSeconds(1);
         }
-        turnTimer.text = "...";
         turnTimerCoroutine = null;
+        OnClickEndTurn();
     }
 
     public void StopTurnTimer() {
@@ -93,7 +146,7 @@ public class MatchController : MonoBehaviour {
                 AddCellToHightlight(map.RightCell(cellToProcess), cells);
                 AddCellToHightlight(map.TopCell(cellToProcess), cells);
                 AddCellToHightlight(map.LeftCell(cellToProcess), cells);
-                AddCellToHightlight(map.BotCell(cellToProcess), cells);                
+                AddCellToHightlight(map.BotCell(cellToProcess), cells);
             }
         }
 
@@ -104,8 +157,8 @@ public class MatchController : MonoBehaviour {
     }
 
     private void AddCellToHightlight(Cell cellToAdd, Queue<Cell> cells) {
-        if (cellToAdd != null 
-            && !cellToAdd.toHighlight 
+        if (cellToAdd != null
+            && !cellToAdd.toHighlight
             && cellToAdd.type == Cell.CellType.NORMAL) {
             cells.Enqueue(cellToAdd);
             cellToAdd.toHighlight = true;
@@ -119,4 +172,12 @@ public class MatchController : MonoBehaviour {
         }
         highlightedCells.Clear();
     }
+}
+
+public enum ControllerState {
+    Solving, // waiting for the match to solve the previous turn
+    Moving, // accepting cell selection for player movement (show movement range)
+    HoveringSpell, // show spell range
+    Aiming, // accepting cell selection for player spell target (show spell range)
+    HoverigRadius // show spell effect radius
 }

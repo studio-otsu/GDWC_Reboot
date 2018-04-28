@@ -73,10 +73,16 @@ public class TurnSolver {
 
     public IEnumerator DoSolveSpells() {
         isSolvingSpells = true;
-        yield return null;
+        foreach (Player p in match.players) {
+            if (p.currentAction.spell.spell != null) {
+                if(match.currentTurn%2 ==0)
+                    match.StartCoroutine(p.currentAction.spell.spell.SolveSpellHeavy(p, p.currentAction.spell.target, map));
+                else
+                    match.StartCoroutine(p.currentAction.spell.spell.SolveSpellLight(p, p.currentAction.spell.target, map));
+            }
+        }
+        yield return new WaitUntil(delegate { return SpellBase.runningSpells == 0; });
         isSolvingSpells = false;
     }
-
-
 
 }

@@ -9,6 +9,7 @@ public class Helper : MonoBehaviour {
         MatchController mc = Instantiate(Resources.Load<GameObject>("Prefabs/MatchInterface")).GetComponent<MatchController>();
         mc.match = m;
         mc.map = m.map;
+        mc.InitializeInterface();
         MatchController.instance = mc;
         m.matchController = mc;
         m.StartMatch();

@@ -7,12 +7,14 @@ public class SpellAttackMelee : SpellBase {
     public SpellAttackMelee() {
         name = "Corps à corps";
         description = "Inflige 20 dégâts sur une ligne perpendiculaire de 1 case / Inflige 30 dégâts sur une ligne perpendiculaire de 1 case.";
+        iconPath = "Sprites/Spells/bleeding-wound";
         rangeLight = new AreaProfile(AreaType.Cross, 1, 1);
         rangeHeavy = new AreaProfile(AreaType.Cross, 1, 1);
         cooldownLight = 0;
         cooldownHeavy = 0;
     }
     public override IEnumerator SolveSpellLight(Player caster, Cell target, Map map) {
+        runningSpells++;
         List<Cell> affectedCells = null;
         if (caster.currentCell.x != target.x) { // attack left or right
             affectedCells = map.GetCellsVerticalLine(target, 0, 1);
@@ -26,9 +28,11 @@ public class SpellAttackMelee : SpellBase {
             // do pretty explosions. pew pew!
             // ...
         }
+        runningSpells--;
         yield return null;
     }
     public override IEnumerator SolveSpellHeavy(Player caster, Cell target, Map map) {
+        runningSpells++;
         List<Cell> affectedCells = null;
         if (caster.currentCell.x != target.x) { // attack left or right
             affectedCells = map.GetCellsVerticalLine(target, 0, 1);
@@ -42,6 +46,7 @@ public class SpellAttackMelee : SpellBase {
             // do pretty explosions. pew pew!
             // ...
         }
+        runningSpells--;
         yield return null;
     }
 }
@@ -50,12 +55,14 @@ public class SpellAttackShort : SpellBase {
     public SpellAttackShort() {
         name = "Attaque courte";
         description = "Inflige 16 dégâts sur une case / Inflige 20 dégâts sur une case.";
+        iconPath = "Sprites/Spells/ice-spear";
         rangeLight = new AreaProfile(AreaType.Circle, 1, 4);
         rangeHeavy = new AreaProfile(AreaType.Circle, 1, 4);
         cooldownLight = 0;
         cooldownHeavy = 0;
     }
     public override IEnumerator SolveSpellLight(Player caster, Cell target, Map map) {
+        runningSpells++;
         List<Cell> affectedCells = map.GetCellsCross(target, 0, 0);
         foreach (Cell c in affectedCells) {
             // damage units
@@ -64,9 +71,11 @@ public class SpellAttackShort : SpellBase {
             // do pretty explosions. pew pew!
             // ...
         }
+        runningSpells--;
         yield return null;
     }
     public override IEnumerator SolveSpellHeavy(Player caster, Cell target, Map map) {
+        runningSpells++;
         List<Cell> affectedCells = map.GetCellsCross(target, 0, 0);
         foreach (Cell c in affectedCells) {
             // damage units
@@ -75,6 +84,7 @@ public class SpellAttackShort : SpellBase {
             // do pretty explosions. pew pew!
             // ...
         }
+        runningSpells--;
         yield return null;
     }
 }
@@ -82,12 +92,14 @@ public class SpellAttackLarge : SpellBase {
     public SpellAttackLarge() {
         name = "Attaque large";
         description = "Inflige 12 dégâts dans une croix de 1 case / Inflige 16 dégâts dans une croix de 1 case.";
+        iconPath = "Sprites/Spells/shatter";
         rangeLight = new AreaProfile(AreaType.Circle, 2, 4);
         rangeHeavy = new AreaProfile(AreaType.Circle, 2, 4);
         cooldownLight = 1;
         cooldownHeavy = 1;
     }
     public override IEnumerator SolveSpellLight(Player caster, Cell target, Map map) {
+        runningSpells++;
         List<Cell> affectedCells = map.GetCellsCross(target, 0, 1);
         foreach (Cell c in affectedCells) {
             // damage units
@@ -96,9 +108,11 @@ public class SpellAttackLarge : SpellBase {
             // do pretty explosions. pew pew!
             // ...
         }
+        runningSpells--;
         yield return null;
     }
     public override IEnumerator SolveSpellHeavy(Player caster, Cell target, Map map) {
+        runningSpells++;
         List<Cell> affectedCells = map.GetCellsCross(target, 0, 1);
         foreach (Cell c in affectedCells) {
             // damage units
@@ -107,6 +121,7 @@ public class SpellAttackLarge : SpellBase {
             // do pretty explosions. pew pew!
             // ...
         }
+        runningSpells--;
         yield return null;
     }
 }
@@ -114,12 +129,14 @@ public class SpellAttackLong : SpellBase {
     public SpellAttackLong() {
         name = "Attaque précise";
         description = "Inflige 20 dégâts sur une case / Inflige 30 dégâts sur uen case.";
+        iconPath = "Sprites/Spells/spark";
         rangeLight = new AreaProfile(AreaType.Circle, 4, 7);
         rangeHeavy = new AreaProfile(AreaType.Circle, 4, 7);
         cooldownLight = 1;
         cooldownHeavy = 1;
     }
     public override IEnumerator SolveSpellLight(Player caster, Cell target, Map map) {
+        runningSpells++;
         List<Cell> affectedCells = map.GetCellsCross(target, 0, 0);
         foreach (Cell c in affectedCells) {
             // damage units
@@ -128,9 +145,11 @@ public class SpellAttackLong : SpellBase {
             // do pretty explosions. pew pew!
             // ...
         }
+        runningSpells--;
         yield return null;
     }
     public override IEnumerator SolveSpellHeavy(Player caster, Cell target, Map map) {
+        runningSpells++;
         List<Cell> affectedCells = map.GetCellsCross(target, 0, 0);
         foreach (Cell c in affectedCells) {
             // damage units
@@ -139,6 +158,7 @@ public class SpellAttackLong : SpellBase {
             // do pretty explosions. pew pew!
             // ...
         }
+        runningSpells--;
         yield return null;
     }
 }
@@ -147,17 +167,22 @@ public class SpellDash : SpellBase {
     public SpellDash() {
         name = "Précipitation";
         description = "Avance de 2 cases / Avance de 3 cases.";
+        iconPath = "Sprites/Spells/fire-dash";
         rangeLight = new AreaProfile(AreaType.Cross, 2, 2);
         rangeHeavy = new AreaProfile(AreaType.Cross, 3, 3);
         cooldownLight = 3;
         cooldownHeavy = 3;
     }
     public override IEnumerator SolveSpellLight(Player caster, Cell target, Map map) {
+        runningSpells++;
         Map.MovePlayerToCell(caster,target);
+        runningSpells--;
         yield return null;
     }
     public override IEnumerator SolveSpellHeavy(Player caster, Cell target, Map map) {
+        runningSpells++;
         Map.MovePlayerToCell(caster, target);
+        runningSpells--;
         yield return null;
     }
 }
@@ -165,17 +190,22 @@ public class SpellHeal : SpellBase {
     public SpellHeal() {
         name = "Soin";
         description = "Rend 8 points de vie / Rend 12 points de vie.";
+        iconPath = "Sprites/Spells/regeneration";
         rangeLight = new AreaProfile(AreaType.Circle, 0, 0);
         rangeHeavy = new AreaProfile(AreaType.Circle, 0, 0);
         cooldownLight = 3;
         cooldownHeavy = 3;
     }
     public override IEnumerator SolveSpellLight(Player caster, Cell target, Map map) {
+        runningSpells++;
         caster.Heal(8);
+        runningSpells--;
         yield return null;
     }
     public override IEnumerator SolveSpellHeavy(Player caster, Cell target, Map map) {
+        runningSpells++;
         caster.Heal(12);
+        runningSpells--;
         yield return null;
     }
 }
