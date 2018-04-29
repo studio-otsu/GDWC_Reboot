@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -239,5 +240,66 @@ public class Map : MonoBehaviour {
                 output.Add(c);
         }
         return output;
+    }
+
+    public bool inLineOfSight(Cell c0, Cell c1) {
+        int x0 = c0.x; int x1 = c1.x; int y0 = c0.y; int y1 = c1.y;
+
+        int dx = Math.Abs(x1 - x0);
+        int dy = Math.Abs(y1 - y0);
+        int x = x0;
+        int y = y0;
+        int n = -1 + dx + dy;
+        int x_inc = (x1 > x0 ? 1 : -1);
+        int y_inc = (y1 > y0 ? 1 : -1);
+        int error = dx - dy;
+        dx *= 2;
+        dy *= 2;
+
+        for (int i = 0; i < 1; i++) {
+            if (error > 0) {
+                x += x_inc;
+                error -= dy;
+            }
+            else if (error < 0) {
+                y += y_inc;
+                error += dx;
+            }
+            else {
+                x += x_inc;
+                error -= dy;
+                y += y_inc;
+                error += dx;
+                n--;
+            }
+        }
+
+        while (n > 0) {
+
+            if(GetCell(x,y).type == Cell.CellType.OBSTACLE) {
+                return false;
+            }
+            else {
+                if (error > 0) {
+                    x += x_inc;
+                    error -= dy;
+                }
+                else if (error < 0) {
+                    y += y_inc;
+                    error += dx;
+                }
+                else {
+                    x += x_inc;
+                    error -= dy;
+                    y += y_inc;
+                    error += dx;
+                    n--;
+                }
+
+                n--;
+            }
+        }
+
+        return true;
     }
 }
