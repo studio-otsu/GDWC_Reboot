@@ -10,6 +10,7 @@ public class Helper : MonoBehaviour {
         mc.match = m;
         mc.map = m.map;
         mc.InitializeInterface();
+        mc.pathTracer = Instantiate(Resources.Load<GameObject>("Prefabs/PathTracer")).GetComponent<LineRenderer>();
         MatchController.instance = mc;
         m.matchController = mc;
         m.StartMatch();

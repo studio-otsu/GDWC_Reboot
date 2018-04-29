@@ -67,7 +67,7 @@ public class Cell : MonoBehaviour
         GetComponent<SpriteRenderer>().color = new Color(0.3f, 0.8f, 0.1f);
     }
 
-    public void PutChosenPathSkin()
+    public void PutPathSkin()
     {
         GetComponent<SpriteRenderer>().color = new Color(0.2f, 0.4f, 0.9f);
     }
@@ -86,6 +86,11 @@ public class Cell : MonoBehaviour
     private void OnMouseDown()
     {
         MatchController.instance.OnMouseDownCell(this);
+    }
+
+    private void OnMouseUp()
+    {
+        MatchController.instance.OnMouseUpCell(this);
     }
 
 

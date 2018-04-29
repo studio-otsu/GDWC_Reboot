@@ -135,4 +135,8 @@ public class Match : MonoBehaviour {
 
         StartNewTurn();
     }
+
+    public Player CurrentPlayer() {
+        return players[playerTurn];
+    }
 }

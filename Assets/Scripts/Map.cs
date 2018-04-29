@@ -27,6 +27,10 @@ public class Map : MonoBehaviour {
         return new Vector3(xPos, yPos);
     }
 
+    public Vector3 CellPosition(Cell c) {
+        return CellPosition(c.x, c.y);
+    }
+
     public Cell GetCell(int x, int y) {
         if (x < 0 || x >= width || y < 0 || y >= height)
             return null;
@@ -94,7 +98,6 @@ public class Map : MonoBehaviour {
     }
 
     public static bool IsAdjacent(Cell cell1, Cell cell2) {
-        if (SameCell(cell1, cell2)) throw new System.Exception("IsAdjacent : same position");
         int distance = Distance(cell1, cell2);
         return (distance == 1);
     }
