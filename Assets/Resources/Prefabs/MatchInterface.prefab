@@ -311,6 +311,7 @@ MonoBehaviour:
   playerPanelsTeamA: {fileID: 224155731565707164}
   playerPanelsTeamB: {fileID: 224000131210552966}
   playerPanels: []
+  pathTracer: {fileID: 0}
   match: {fileID: 0}
   map: {fileID: 0}
 --- !u!114 &114138227679246742
@@ -695,7 +696,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  m_IsOn: 1
+  m_IsOn: 0
 --- !u!114 &114881356218538008
 MonoBehaviour:
   m_ObjectHideFlags: 1
