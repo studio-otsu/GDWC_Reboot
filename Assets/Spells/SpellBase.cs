@@ -14,8 +14,8 @@ public abstract class SpellBase {
     public int cooldownHeavy;
     public AreaProfile rangeLight;
     public AreaProfile rangeHeavy;
-    public bool lineOfSightLight;
-    public bool lineOfSightHeavy;
+    public bool lineOfSightLight = true;
+    public bool lineOfSightHeavy = true;
 
     public abstract IEnumerator SolveSpellLight(Player caster, Cell target, Map map);
     public abstract IEnumerator SolveSpellHeavy(Player caster, Cell target, Map map);

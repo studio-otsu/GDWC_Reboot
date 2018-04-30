@@ -89,13 +89,16 @@ public class MatchController : MonoBehaviour {
         }
         currentSpell = spell;
         AreaProfile range;
-        if (match.currentTurn % 2 == 0)
+        bool los;
+        if (match.currentTurn % 2 == 0) {
             range = match.player.spells[spell].spell.rangeHeavy;
-        else
+            los = match.player.spells[spell].spell.lineOfSightHeavy;
+        } else {
             range = match.player.spells[spell].spell.rangeLight;
+            los = match.player.spells[spell].spell.lineOfSightLight;
+        }
         
-        spellRangeCells.AddRange(map.GetCellsArea(match.player.nextCell, range));
-        spellRangeCells.RemoveAll(c => !map.inLineOfSight(match.player.nextCell,c));
+        spellRangeCells.AddRange(map.GetCellsArea(match.player.nextCell, range, los));
         
         //do coloring
         foreach (Cell c in spellRangeCells) {

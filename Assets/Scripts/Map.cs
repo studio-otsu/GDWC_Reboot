@@ -169,23 +169,23 @@ public class Map : MonoBehaviour {
 
     }
 
-    public List<Cell> GetCellsArea(Cell center, AreaProfile area) {
+    public List<Cell> GetCellsArea(Cell center, AreaProfile area, bool checkLineOfSight = false) {
         switch (area.type) {
             case AreaType.Cross:
-                return GetCellsCross(center, area.max, area.min);
+                return GetCellsCross(center, area.max, area.min, checkLineOfSight);
             default:
-                return GetCellsCircle(center, area.max, area.min);
+                return GetCellsCircle(center, area.max, area.min, checkLineOfSight);
         }
     }
 
-    public List<Cell> GetCellsCircle(Cell center, int max, int min = 0) {
+    public List<Cell> GetCellsCircle(Cell center, int max, int min = 0, bool checkLineOfSight = false) {
         List<Cell> output = new List<Cell>();
         for (int y = Mathf.Max(0, center.y - Mathf.Max(min, max)); y <= Mathf.Min(height, center.y + Mathf.Max(min, max)); y++) {
             for (int x = Mathf.Max(0, center.x - Mathf.Max(min, max)); x <= Mathf.Min(width, center.x + Mathf.Max(min, max)); x++) {
                 Cell c = GetCell(x, y);
                 if (c != null) {
                     int distance = Distance(center, c);
-                    if (distance >= Mathf.Min(min, max) && distance <= Mathf.Max(min, max)) {
+                    if (distance >= Mathf.Min(min, max) && distance <= Mathf.Max(min, max) &&(!checkLineOfSight||inLineOfSight(center,c))) {
                         output.Add(c);
                     }
                 }
@@ -194,49 +194,49 @@ public class Map : MonoBehaviour {
         return output;
     }
 
-    public List<Cell> GetCellsCross(Cell center, int max, int min = 0) {
-        return new List<Cell>(GetCellsVerticalLine(center, max, min).Union(GetCellsHorizontalLine(center, max, min)));
+    public List<Cell> GetCellsCross(Cell center, int max, int min = 0, bool checkLineOfSight = false) {
+        return new List<Cell>(GetCellsVerticalLine(center, max, min, checkLineOfSight).Union(GetCellsHorizontalLine(center, max, min, checkLineOfSight)));
     }
 
-    public List<Cell> GetCellsVerticalLine(Cell center, int max, int min = 0) {
-        return new List<Cell>(GetCellsTopLine(center, max, min).Union(GetCellsBottomLine(center, max, min)));
+    public List<Cell> GetCellsVerticalLine(Cell center, int max, int min = 0, bool checkLineOfSight = false) {
+        return new List<Cell>(GetCellsTopLine(center, max, min, checkLineOfSight).Union(GetCellsBottomLine(center, max, min, checkLineOfSight)));
     }
-    public List<Cell> GetCellsHorizontalLine(Cell center, int max, int min = 0) {
-        return new List<Cell>(GetCellsLeftLine(center, max, min).Union(GetCellsRightLine(center, max, min)));
+    public List<Cell> GetCellsHorizontalLine(Cell center, int max, int min = 0, bool checkLineOfSight = false) {
+        return new List<Cell>(GetCellsLeftLine(center, max, min, checkLineOfSight).Union(GetCellsRightLine(center, max, min, checkLineOfSight)));
     }
 
-    public List<Cell> GetCellsTopLine(Cell center, int max, int min = 0) {
+    public List<Cell> GetCellsTopLine(Cell center, int max, int min = 0, bool checkLineOfSight = false) {
         List<Cell> output = new List<Cell>();
         for (int i = Mathf.Min(min, max); i <= Mathf.Max(min, max); ++i) {
             Cell c = GetCell(center.x, center.y - i);
-            if (c != null)
+            if (c != null && (!checkLineOfSight || inLineOfSight(center, c)))
                 output.Add(c);
         }
         return output;
     }
-    public List<Cell> GetCellsBottomLine(Cell center, int max, int min = 0) {
+    public List<Cell> GetCellsBottomLine(Cell center, int max, int min = 0, bool checkLineOfSight = false) {
         List<Cell> output = new List<Cell>();
         for (int i = Mathf.Min(min, max); i <= Mathf.Max(min, max); ++i) {
             Cell c = GetCell(center.x, center.y + i);
-            if (c != null)
+            if (c != null && (!checkLineOfSight || inLineOfSight(center, c)))
                 output.Add(c);
         }
         return output;
     }
-    public List<Cell> GetCellsLeftLine(Cell center, int max, int min = 0) {
+    public List<Cell> GetCellsLeftLine(Cell center, int max, int min = 0, bool checkLineOfSight = false) {
         List<Cell> output = new List<Cell>();
         for (int i = Mathf.Min(min, max); i <= Mathf.Max(min, max); ++i) {
             Cell c = GetCell(center.x - i, center.y);
-            if (c != null)
+            if (c != null && (!checkLineOfSight || inLineOfSight(center, c)))
                 output.Add(c);
         }
         return output;
     }
-    public List<Cell> GetCellsRightLine(Cell center, int max, int min = 0) {
+    public List<Cell> GetCellsRightLine(Cell center, int max, int min = 0, bool checkLineOfSight = false) {
         List<Cell> output = new List<Cell>();
         for (int i = Mathf.Min(min, max); i <= Mathf.Max(min, max); ++i) {
             Cell c = GetCell(center.x + i, center.y);
-            if (c != null)
+            if (c != null && (!checkLineOfSight || inLineOfSight(center,c)))
                 output.Add(c);
         }
         return output;
