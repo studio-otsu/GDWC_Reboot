@@ -52,32 +52,79 @@ public class MatchController : MonoBehaviour {
 
     #region SPELLS
     public void OnHoverSpellStart(int spell) {
-        if (state > ControllerState.Solving) { // ignore hovering during solving phase
+        //if (state > ControllerState.Solving) { // ignore hovering during solving phase
+            currentSpell = spell;
             AreaProfile range;
             if (match.currentTurn % 2 == 0)
                 range = match.player.spells[spell].spell.rangeHeavy;
             else
                 range = match.player.spells[spell].spell.rangeLight;
-            switch (range.type) {
-                case AreaType.Circle:
-                    spellRangeCells.AddRange(map.GetCellsCircle(match.player.currentCell, range.max, range.min)); break;
-                case AreaType.Cross:
-                    spellRangeCells.AddRange(map.GetCellsCross(match.player.currentCell, range.max, range.min)); break;
-                default: break;
-            }
+            spellRangeCells.AddRange(map.GetCellsArea(match.player.nextCell, range));
             //do coloring
-        }
+            foreach (Cell c in spellRangeCells) {
+                c.PutRangeSkin();
+            }
+        //}
     }
+    private int currentSpell = -1;
     private List<Cell> spellRangeCells = new List<Cell>();
     public void OnHoverSpellEnd() {
-        if (state > ControllerState.Solving) { // ignore hovering during solving phase
+        currentSpell = -1;
+        //if (state > ControllerState.Solving) { // ignore hovering during solving phase
             //1.undo color
+            foreach(Cell c in spellRangeCells) {
+                c.PutDefaultSkin();
+            }
             spellRangeCells.Clear();
-        }
+        //}
     }
     public void OnClickSpell(int spell) {
-        if (state > ControllerState.Solving) { // ignore click during solving phase
+        //if (state > ControllerState.Solving) { // ignore click during solving phase
+        if (currentSpell != -1) {
+            ClearRangeColor();
+            if (currentSpell == spell) {
+                currentSpell = -1;
+                return;
+            }
         }
+        currentSpell = spell;
+        AreaProfile range;
+        if (match.currentTurn % 2 == 0)
+            range = match.player.spells[spell].spell.rangeHeavy;
+        else
+            range = match.player.spells[spell].spell.rangeLight;
+        spellRangeCells.AddRange(map.GetCellsArea(match.player.nextCell, range));
+        //do coloring
+        foreach (Cell c in spellRangeCells) {
+            if(c.type == Cell.CellType.NORMAL)
+                c.PutRangeSkin();
+        }
+        //}
+    }
+
+    public void OnClickCellSpell(Cell c) {
+        //check cancel
+        if(match.player.currentAction.spell.target == c) {
+            c.PutDefaultSkin();
+            match.player.currentAction.spell.spell = null;
+            match.player.currentAction.spell.target = null;
+        } else {
+            if (currentSpell != -1 && c.type == Cell.CellType.NORMAL && spellRangeCells.Contains(c)) { // spell, targetable, in range
+                match.player.currentAction.spell.spell = match.player.spells[currentSpell];
+                match.player.currentAction.spell.target = c;
+                ClearRangeColor();
+                c.PutSpellSkin();
+                currentSpell = -1;
+            }
+        }
+    }
+
+    private void ClearRangeColor() {
+        foreach (Cell c in spellRangeCells) {
+            if(c != match.player.currentAction.spell.target)
+                c.PutDefaultSkin();
+        }
+        spellRangeCells.Clear();
     }
     #endregion // SPELLS
 
@@ -114,6 +161,8 @@ public class MatchController : MonoBehaviour {
         }
         ClearAllCells();
         ClearSelectedPathArrow();
+        ClearRangeColor();
+        currentSpell = -1;
         StopTurnTimer();
         endTurn.interactable = false;
     }
@@ -144,6 +193,7 @@ public class MatchController : MonoBehaviour {
     #endregion // TIMER
 
     public void OnMouseDownCell(Cell cell) {
+        if (currentSpell != -1) return; // aiming spell, don't track movement
         if (!IsCellEventValid(cell)) { return; }
         ClearSelectedPathCells();
         selectingPath = true;
@@ -165,6 +215,10 @@ public class MatchController : MonoBehaviour {
     }
 
     public void OnMouseUpCell(Cell cell) {
+        if (currentSpell != -1) { // aiming spell, do spell, don't track movement
+            OnClickCellSpell(cell);
+            return;
+        }
         if (!IsCellEventValid(cell)) { return; }
         if (!selectingPath) { throw new Exception("SelectingPath not set to true"); }
         selectingPath = false;
@@ -181,6 +235,7 @@ public class MatchController : MonoBehaviour {
     }
 
     public void OnMouseEnterNewCell(Cell cell) {
+        if (currentSpell != -1) return; // aiming spell, don't track movement
         if (!IsCellEventValid(cell)) { return; }
         if (!selectingPath) {
             ClearHighlightedCells();

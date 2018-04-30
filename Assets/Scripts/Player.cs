@@ -14,6 +14,14 @@ public class Player : Unit {
             new PlayerSpell() { spell = new SpellHeal() }};
     }
 
+    public Cell nextCell {
+        get {
+            if (currentAction.move.Count > 0)
+                return currentAction.move[currentAction.move.Count - 1];
+            return currentCell;
+        }
+    }
+
     public TurnAction currentAction;
 
     public int mpCurrent = 3;
