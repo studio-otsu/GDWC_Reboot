@@ -59,13 +59,19 @@ public class TurnSolver {
                     if (Collide(a, b)) { // DAMN SON
                         a.p.Damage(4);
                         if (a.to != a.from) { // if player was moving
-                            a.p.currentAction.move.Clear();
-                            //a.p.currentAction.spell.spell = a.p.currentAction.spell.target = null; // cancel spell?
+                            int x = a.from.x - a.p.currentAction.move[a.p.currentAction.move.Count - 1].x;
+                            int y = a.from.y - a.p.currentAction.move[a.p.currentAction.move.Count - 1].y;
+                            a.p.currentAction.spell.target = map.GetCell(a.p.currentAction.spell.target.x + x,
+                                a.p.currentAction.spell.target.y + y); // reaim spell
+                            a.p.currentAction.move.Clear(); // clear movement
                         }
                         b.p.Damage(4);
                         if (b.to != b.from) { // if player was moving
-                            b.p.currentAction.move.Clear();
-                            //b.p.currentAction.spell.spell = b.p.currentAction.spell.target = null; // cancel spell?
+                            int x = b.from.x - b.p.currentAction.move[b.p.currentAction.move.Count - 1].x;
+                            int y = b.from.y - b.p.currentAction.move[b.p.currentAction.move.Count - 1].y;
+                            b.p.currentAction.spell.target = map.GetCell(b.p.currentAction.spell.target.x + x,
+                                b.p.currentAction.spell.target.y + y); // reaim spell
+                            b.p.currentAction.move.Clear(); // clear movement
                         }
                         verified = false; // still need verifications
                         i = steps.Count; // cancel remaining verifications
