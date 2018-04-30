@@ -72,13 +72,13 @@ public class Cell : MonoBehaviour
         GetComponent<SpriteRenderer>().color = new Color(0.2f, 0.4f, 0.9f);
     }
 
-    public void PutRangeSkin() {
+    public void PutSpellRangeSkin() {
         if (type == CellType.NORMAL) {
             GetComponent<SpriteRenderer>().color = new Color(0.5f, 0.5f, 0.1f);
         }
     }
 
-    public void PutSpellSkin() {
+    public void PutSpellAreaSkin() {
         if (type == CellType.NORMAL) {
             GetComponent<SpriteRenderer>().color = new Color(1.0f, 0.25f, 0.25f);
         }

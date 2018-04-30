@@ -19,6 +19,13 @@ public abstract class SpellBase {
 
     public abstract IEnumerator SolveSpellLight(Player caster, Cell target, Map map);
     public abstract IEnumerator SolveSpellHeavy(Player caster, Cell target, Map map);
+
+    public virtual List<Cell> GetEffectAreaPreviewHeavy(Player caster, Cell target, Map map) {
+        return new List<Cell>(new Cell[] { target});
+    }
+    public virtual List<Cell> GetEffectAreaPreviewLight(Player caster, Cell target, Map map) {
+        return new List<Cell>(new Cell[] { target });
+    }
 }
 
 public enum AreaType {

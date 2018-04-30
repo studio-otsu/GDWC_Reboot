@@ -49,6 +49,25 @@ public class SpellAttackMelee : SpellBase {
         runningSpells--;
         yield return null;
     }
+
+    public override List<Cell> GetEffectAreaPreviewHeavy(Player caster, Cell target, Map map) {
+        List<Cell> affectedCells = null;
+        if (caster.nextCell.x != target.x) { // attack left or right
+            affectedCells = map.GetCellsVerticalLine(target, 0, 1);
+        } else if (caster.nextCell.y != target.y) { // attack up or down
+            affectedCells = map.GetCellsHorizontalLine(target, 0, 1);
+        } else throw new System.Exception("Can't aim at the caster cell!");
+        return affectedCells;
+    }
+    public override List<Cell> GetEffectAreaPreviewLight(Player caster, Cell target, Map map) {
+        List<Cell> affectedCells = null;
+        if (caster.nextCell.x != target.x) { // attack left or right
+            affectedCells = map.GetCellsVerticalLine(target, 0, 1);
+        } else if (caster.nextCell.y != target.y) { // attack up or down
+            affectedCells = map.GetCellsHorizontalLine(target, 0, 1);
+        } else throw new System.Exception("Can't aim at the caster cell!");
+        return affectedCells;
+    }
 }
 
 public class SpellAttackShort : SpellBase {
@@ -124,6 +143,15 @@ public class SpellAttackLarge : SpellBase {
         runningSpells--;
         yield return null;
     }
+
+    public override List<Cell> GetEffectAreaPreviewHeavy(Player caster, Cell target, Map map) {
+        List<Cell> affectedCells = map.GetCellsCross(target, 0, 1);
+        return affectedCells;
+    }
+    public override List<Cell> GetEffectAreaPreviewLight(Player caster, Cell target, Map map) {
+        List<Cell> affectedCells = map.GetCellsCross(target, 0, 1);
+        return affectedCells;
+    }
 }
 public class SpellAttackLong : SpellBase {
     public SpellAttackLong() {
@@ -184,6 +212,33 @@ public class SpellDash : SpellBase {
         //Map.MovePlayerToAdjacentCell(caster, target);
         runningSpells--;
         yield return null;
+    }
+
+    public override List<Cell> GetEffectAreaPreviewHeavy(Player caster, Cell target, Map map) {
+        List<Cell> affectedCells = null;
+        if (caster.nextCell.x > target.x) { // aim left
+            affectedCells = map.GetCellsRightLine(target, 0, 2);
+        } else if (caster.nextCell.x < target.x) { // aim right
+            affectedCells = map.GetCellsLeftLine(target, 0, 2);
+        } else if (caster.nextCell.y > target.y) { // aim down
+            affectedCells = map.GetCellsTopLine(target, 0, 2);
+        } else if (caster.nextCell.y < target.y) { // aim up
+            affectedCells = map.GetCellsBottomLine(target, 0, 2);
+        } else throw new System.Exception("Can't aim at the caster cell!");
+        return affectedCells;
+    }
+    public override List<Cell> GetEffectAreaPreviewLight(Player caster, Cell target, Map map) {
+        List<Cell> affectedCells = null;
+        if (caster.nextCell.x > target.x) { // aim left
+            affectedCells = map.GetCellsRightLine(target, 0, 2);
+        } else if (caster.nextCell.x < target.x) { // aim right
+            affectedCells = map.GetCellsLeftLine(target, 0, 2);
+        } else if (caster.nextCell.y > target.y) { // aim down
+            affectedCells = map.GetCellsTopLine(target, 0, 2);
+        } else if (caster.nextCell.y < target.y) { // aim up
+            affectedCells = map.GetCellsBottomLine(target, 0, 2);
+        } else throw new System.Exception("Can't aim at the caster cell!");
+        return affectedCells;
     }
 }
 public class SpellHeal : SpellBase {
