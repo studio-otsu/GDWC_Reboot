@@ -93,7 +93,10 @@ public class MatchController : MonoBehaviour {
             range = match.player.spells[spell].spell.rangeHeavy;
         else
             range = match.player.spells[spell].spell.rangeLight;
+        
         spellRangeCells.AddRange(map.GetCellsArea(match.player.nextCell, range));
+        spellRangeCells.RemoveAll(c => !map.inLineOfSight(match.player.nextCell,c));
+        
         //do coloring
         foreach (Cell c in spellRangeCells) {
             if(c.type == Cell.CellType.NORMAL)
