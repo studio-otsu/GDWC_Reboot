@@ -88,12 +88,14 @@ public class MatchController : MonoBehaviour {
                     state = ControllerState.Moving;
                     return;
                 }
-            } else if (state == ControllerState.Spelled) {
+            }
+            else if (state == ControllerState.Spelled) {
                 state = ControllerState.Spelling;
                 ClearAreaColor();
                 match.player.currentAction.spell.spell = null;
                 match.player.currentAction.spell.target = null;
-            } else {
+            }
+            else {
                 state = ControllerState.Spelling;
             }
             currentSpell = spell;
@@ -102,7 +104,8 @@ public class MatchController : MonoBehaviour {
             if (match.currentTurn % 2 == 0) {
                 range = match.player.spells[spell].spell.rangeHeavy;
                 los = match.player.spells[spell].spell.lineOfSightHeavy;
-            } else {
+            }
+            else {
                 range = match.player.spells[spell].spell.rangeLight;
                 los = match.player.spells[spell].spell.lineOfSightLight;
             }
@@ -124,7 +127,8 @@ public class MatchController : MonoBehaviour {
                 match.player.currentAction.spell.spell = null;
                 match.player.currentAction.spell.target = null;
                 state = ControllerState.Moving; // back to movement
-            } else if (currentSpell != -1 && cell.type == Cell.CellType.NORMAL && spellRangeCells.Contains(cell)) { // spelling, targetable, in range
+            }
+            else if (currentSpell != -1 && cell.type == Cell.CellType.NORMAL && spellRangeCells.Contains(cell)) { // spelling, targetable, in range
                 match.player.currentAction.spell.spell = match.player.spells[currentSpell];
                 match.player.currentAction.spell.target = cell;
                 ClearRangeColor();
@@ -222,69 +226,119 @@ public class MatchController : MonoBehaviour {
     }
     #endregion // TIMER
 
+    #region MOUSE_CELL_EVENTS
     public void OnMouseDownCell(Cell cell) {
-        if (state != ControllerState.Moving) return; // spelling/already spelled
-        if (!IsCellEventValid(cell)) { return; }
-        ClearSelectedPathCells();
-        selectingPath = true;
-        selectedPathCells.Add(cell);
-        ClearHighlightedCells();
-        if (Map.IsAdjacent(match.CurrentPlayer().currentCell, cell)) {
-            DrawArrowForSelectedPath(selectedPathCells);
+        if (!IsChoicePhaseActive()) { return; }
+        switch (state) {
+            case ControllerState.Moving:
+                OnMouseDownCellMoving(cell);
+                break;
         }
-        //if (selectedSpell == null) {
-        //    //Do the move
-        //    ClearChosenPathCells();
-        //    AddMovementToPlayer(cell);
-        //    //currentPlayer.AddMovementToCell(cell);
-        //}
-        //else {
-        //    //Target the spell
-        //}
-
     }
 
     public void OnMouseUpCell(Cell cell) {
-        if (state > ControllerState.Moving) { // spelling/already spelled
-            OnClickCellSpell(cell);
-            return;
+        if (!IsChoicePhaseActive()) { return; }
+        switch (state) {
+            case ControllerState.Moving:
+                EndDrawingMovePath(cell);
+                break;
+            case ControllerState.Spelled:
+            case ControllerState.Spelling:
+                OnClickCellSpell(cell);
+                break;
         }
-        if (!IsCellEventValid(cell)) { return; }
-        if (!selectingPath) { throw new Exception("SelectingPath not set to true"); }
-        selectingPath = false;
-        match.CurrentPlayer().ClearMovementAction();
-        ClearSelectedPathArrow();
-        if (selectedPathCells.Count == 1) {
-            ClearSelectedPathCells();
-            AddMovementToPlayer(cell);
-        } else {
-            AddMovementToPlayer(selectedPathCells);
-        }
-
     }
 
     public void OnMouseEnterNewCell(Cell cell) {
-        if (state != ControllerState.Moving) return; // solving, spelling, or already spelled
-        if (!IsCellEventValid(cell)) { return; }
-        if (!selectingPath) {
-            ClearHighlightedCells();
-            hoveredCell = cell;
-            if (hoveredCell.currentUnit != null) {
-                Player hoveredPlayer = hoveredCell.currentUnit.GetComponent<Player>();
-                if (hoveredPlayer != null) {
-                    DisplayMPRange(hoveredCell, hoveredPlayer.mpCurrent);
-                }
-            } else {
-                DisplayMovePrediction(hoveredCell);
-            }
-        } else {
-            if (selectedPathCells.Count + 1 <= match.CurrentPlayer().mpCurrent
-                && Map.IsAdjacent(selectedPathCells[0], match.CurrentPlayer().currentCell)) {
-                selectedPathCells.Add(cell);
-                DrawArrowForSelectedPath(selectedPathCells);
+        if (!IsChoicePhaseActive()) { return; }
+        switch (state) {
+            case ControllerState.Moving:
+                OnMouseEnterCellMoving(cell);
+                break;
+        }
+    }
+    #endregion //MOUSE_CELL_EVENTS
+
+    #region MOVING_EVENTS
+    private void OnMouseDownCellMoving(Cell cell) {
+        if (cell.type != Cell.CellType.NORMAL) { return; }
+        StartDrawingMovePath(cell);
+    }
+
+    private void OnMouseEnterCellMoving(Cell cell) {
+        if (cell.type != Cell.CellType.NORMAL) { return; }
+        if (selectingPath) {
+            ContinueDrawingMovePath(cell);
+        }
+        else {
+            ShowCellMoveInformation(cell);
+        }
+    }
+
+    private void OnMouseUpCellMoving(Cell cell) {
+        if (cell.type != Cell.CellType.NORMAL) { return; }
+        if (selectingPath) {
+            EndDrawingMovePath(cell);
+        }
+    }
+    #endregion //MOVING_EVENTS
+
+    #region MOVEMENT
+    private void StartDrawingMovePath(Cell cell) {
+        ClearSelectedPathCells();
+        selectedPathCells.Add(cell);
+        ClearHighlightedCells();
+        if (Map.IsAdjacent(match.CurrentPlayer().currentCell, cell)) {
+            selectingPath = true;
+            DrawArrowForSelectedPath(selectedPathCells);
+        }
+    }
+
+    private void ContinueDrawingMovePath(Cell cell) {
+        if (selectedPathCells.Count == 0) return; //sometimes count == 0 which raise an exception, TODO : check why count can be 0
+        Cell last = selectedPathCells[selectedPathCells.Count - 1];
+        if (Map.IsAdjacent(cell, last)
+            && selectedPathCells.Count + 1 <= match.CurrentPlayer().mpCurrent
+            && Map.IsAdjacent(selectedPathCells[0], match.CurrentPlayer().currentCell)) {
+            selectedPathCells.Add(cell);
+            DrawArrowForSelectedPath(selectedPathCells);
+        }
+    }
+
+    private void EndDrawingMovePath(Cell cell) {
+        selectingPath = false;
+        match.CurrentPlayer().ClearMovementAction();
+        ClearSelectedPathArrow();
+        if (selectedPathCells.Count <= 1) {
+            ClearSelectedPathCells();
+            AddMovementToPlayer(cell);
+        }
+        else {
+            AddMovementToPlayer(selectedPathCells);
+        }
+    }
+
+    private void ShowCellMoveInformation(Cell cell) {
+        ClearHighlightedCells();
+        hoveredCell = cell;
+        if (hoveredCell.currentUnit != null) { //Player mp range information
+            Player hoveredPlayer = hoveredCell.currentUnit.GetComponent<Player>();
+            if (hoveredPlayer != null) {
+                DisplayMPRange(hoveredCell, hoveredPlayer.mpCurrent);
             }
         }
+        else {
+            DisplayMovePrediction(hoveredCell); //Move prediction information
+        }
+    }
 
+    private void DrawArrowForSelectedPath(List<Cell> path) {
+        pathTracer.positionCount = path.Count + 1;
+        pathTracer.SetPosition(0, map.CellPosition(match.CurrentPlayer().currentCell));
+        for (int i = 0; i < path.Count; ++i) {
+            Vector3 pos = map.CellPosition(path[i]);
+            pathTracer.SetPosition(i + 1, pos);
+        }
     }
 
     private void AddMovementToPlayer(Cell destinationCell) {
@@ -302,29 +356,10 @@ public class MatchController : MonoBehaviour {
         Player p = match.CurrentPlayer();
         if (!IsMovementValid(path, p)) {
             ClearSelectedPathCells();
-        } else {
+        }
+        else {
             p.AddMoveToTurnAction(path);
             DrawArrowForSelectedPath(path);
-        }
-    }
-
-    private bool IsMovementValid(List<Cell> path, Player p) {
-        if (!Map.IsAdjacent(path[0], p.currentCell) || path.Count > p.mpCurrent) {
-            return false;
-        }
-        return true;
-    }
-
-    private bool IsCellEventValid(Cell c) {
-        return match.phase == Match.TurnPhase.Choice && c.type == Cell.CellType.NORMAL;
-    }
-
-    private void DrawArrowForSelectedPath(List<Cell> path) {
-        pathTracer.positionCount = path.Count + 1;
-        pathTracer.SetPosition(0, map.CellPosition(match.CurrentPlayer().currentCell));
-        for (int i = 0; i < path.Count; ++i) {
-            Vector3 pos = map.CellPosition(path[i]);
-            pathTracer.SetPosition(i + 1, pos);
         }
     }
 
@@ -346,6 +381,15 @@ public class MatchController : MonoBehaviour {
         }
     }
 
+    private bool IsMovementValid(List<Cell> path, Player p) {
+        if (!Map.IsAdjacent(path[0], p.currentCell) || path.Count > p.mpCurrent) {
+            return false;
+        }
+        return true;
+    }
+    #endregion //MOVEMENT
+
+    #region CLEARING
     private void ClearAllCells() {
         foreach (Cell cell in map.cells) {
             cell.PutDefaultSkin();
@@ -370,6 +414,11 @@ public class MatchController : MonoBehaviour {
 
     private void ClearSelectedPathArrow() {
         pathTracer.positionCount = 0;
+    }
+    #endregion //CLEARING
+
+    private bool IsChoicePhaseActive() {
+        return match.phase == Match.TurnPhase.Choice;
     }
 }
 
