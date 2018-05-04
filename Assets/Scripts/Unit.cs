@@ -35,17 +35,24 @@ public class Unit : MonoBehaviour {
             healthCurrent = healthMax;
     }
     public void Damage(int amount) {
-        healthCurrent -= amount;
-        if (healthCurrent < 0)
-            healthCurrent = 0;
+        turnDamage -= amount;
     }
     public void Heal(int amount) {
-        healthCurrent += amount;
-        if (healthCurrent > healthMax)
-            healthCurrent = healthMax;
+        turnHeal += amount;
     }
     public void Shield(int amount) {
         shieldCurrent += amount;
+    }
+
+    public int turnDamage = 0;
+    public int turnHeal = 0;
+    public void ApplyTurnDamageHeal() {
+        int turnDelta = turnDamage + turnHeal;
+        healthCurrent += turnDelta;
+        if (healthCurrent > healthMax)
+            healthCurrent = healthMax;
+        if (healthCurrent < 0)
+            healthCurrent = 0;
     }
 
     public Color teamColor {

@@ -10,13 +10,17 @@ public class TurnSolver {
 
     public bool isSolvingMovements;
 
-    public IEnumerator DoSolveMovements() {
+    public IEnumerator DoSolveMovements(bool dash = false) {
         isSolvingMovements = true;
         for (int i = 0; i < 5; ++i) {
-            if (!TryMovementStep(i))
+            if (!TryMovementStep(i, dash))
                 throw new System.Exception("something went wrong. sort that out you fool!");
-            CommitMovementStep(i);
-            yield return new WaitForSeconds(0.25f);
+            CommitMovementStep(i, dash);
+            if (dash) {
+                yield return new WaitForSeconds(0.10f);
+            } else {
+                yield return new WaitForSeconds(0.25f);
+            }
         }
         isSolvingMovements = false;
     }
@@ -35,7 +39,7 @@ public class TurnSolver {
         return false;
     }
 
-    private bool TryMovementStep(int step) {
+    private bool TryMovementStep(int step, bool dash) {
         List<Step> steps = new List<Step>();
         bool verified = false;
         int iterations = 0;
@@ -57,7 +61,8 @@ public class TurnSolver {
                 for (int j = i + 1; j < steps.Count; ++j) {
                     Step b = steps[j];
                     if (Collide(a, b)) { // DAMN SON
-                        a.p.Damage(4);
+                        if(!dash) // only damage mover during movement, not dashes
+                            a.p.Damage(4);
                         if (a.to != a.from) { // if player was moving
                             int x = a.from.x - a.p.currentAction.move[a.p.currentAction.move.Count - 1].x;
                             int y = a.from.y - a.p.currentAction.move[a.p.currentAction.move.Count - 1].y;
@@ -83,7 +88,7 @@ public class TurnSolver {
         return true;
     }
 
-    private void CommitMovementStep(int step) {
+    private void CommitMovementStep(int step, bool dash) {
         foreach (Player p in match.players) {
             if (p.currentAction.move.Count > step) {
                 Map.MovePlayerToAdjacentCell(p, p.currentAction.move[step]);
@@ -95,20 +100,117 @@ public class TurnSolver {
 
     public IEnumerator DoSolveSpells() {
         isSolvingSpells = true;
+        if (DoSolveSpellPriority0()) // protec
+            yield return new WaitUntil(delegate { return SpellBase.runningSpells == 0; });
+        if (DoSolveSpellPriority1()) // tp
+            yield return new WaitUntil(delegate { return SpellBase.runningSpells == 0; });
+        if (DoSolveSpellPriority2()) // dash
+            yield return new WaitWhile(delegate { return isSolvingMovements; });
+        if (DoSolveSpellPriority3()) // damage/heal/buff
+            yield return new WaitUntil(delegate { return SpellBase.runningSpells == 0; });
+
+        foreach (Player p in match.players) { // update health balance for each player
+            p.ApplyTurnDamageHeal();
+        }
+
+        isSolvingSpells = false;
+    }
+
+    // protec
+    public bool DoSolveSpellPriority0() {
+        bool didSomething = false;
         foreach (Player p in match.players) {
-            if (p.currentAction.spell.spell != null && p.currentAction.spell.target != null && !p.currentAction.spell.spell.isRecharging) {
+            TurnSpell spell = p.currentAction.spell;
+            if (spell.spell != null && spell.target != null && !spell.spell.isRecharging) {
                 if (match.currentTurn % 2 == 0) {
-                    match.StartCoroutine(p.currentAction.spell.spell.spell.SolveSpellHeavy(p, p.currentAction.spell.target, map));
-                    p.currentAction.spell.spell.StartCooldownHeavy();
+                    if (spell.spell.spell.priorityHeavy == 0) {
+                        match.StartCoroutine(spell.spell.spell.SolveSpellHeavy(p, spell.target, map));
+                        spell.spell.StartCooldownHeavy();
+                        didSomething = true;
+                    }
                 } else {
-                    match.StartCoroutine(p.currentAction.spell.spell.spell.SolveSpellLight(p, p.currentAction.spell.target, map));
-                    p.currentAction.spell.spell.StartCooldownLight();
+                    if (spell.spell.spell.priorityLight == 0) {
+                        match.StartCoroutine(spell.spell.spell.SolveSpellLight(p, spell.target, map));
+                        spell.spell.StartCooldownLight();
+                        didSomething = true;
+                    }
                 }
-                //Debug.Log("Using " + p.currentAction.spell.spell.spell.name + " spell!");
             }
         }
-        yield return new WaitUntil(delegate { return SpellBase.runningSpells == 0; });
-        isSolvingSpells = false;
+        return didSomething;
+    }
+
+    // tp
+    public bool DoSolveSpellPriority1() {
+        bool didSomething = false;
+        foreach (Player p in match.players) {
+            TurnSpell spell = p.currentAction.spell;
+            if (spell.spell != null && spell.target != null && !spell.spell.isRecharging) {
+                if (match.currentTurn % 2 == 0) {
+                    if (spell.spell.spell.priorityHeavy == 1) {
+                        match.StartCoroutine(spell.spell.spell.SolveSpellHeavy(p, spell.target, map));
+                        spell.spell.StartCooldownHeavy();
+                        didSomething = true;
+                    }
+                } else {
+                    if (spell.spell.spell.priorityLight == 1) {
+                        match.StartCoroutine(spell.spell.spell.SolveSpellLight(p, spell.target, map));
+                        spell.spell.StartCooldownLight();
+                        didSomething = true;
+                    }
+                }
+            }
+        }
+        return didSomething;
+    }
+
+    // dash
+    public bool DoSolveSpellPriority2() {
+        bool didSomething = false;
+        foreach (Player p in match.players) {
+            TurnSpell spell = p.currentAction.spell;
+            if (spell.spell != null && spell.target != null && !spell.spell.isRecharging) {
+                if (match.currentTurn % 2 == 0) {
+                    if (spell.spell.spell.priorityHeavy == 2) {
+                        match.StartCoroutine(spell.spell.spell.SolveSpellHeavy(p, spell.target, map));
+                        spell.spell.StartCooldownHeavy();
+                        didSomething = true;
+                    }
+                } else {
+                    if (spell.spell.spell.priorityLight == 2) {
+                        match.StartCoroutine(spell.spell.spell.SolveSpellLight(p, spell.target, map));
+                        spell.spell.StartCooldownLight();
+                        didSomething = true;
+                    }
+                }
+            }
+        }
+        if (didSomething) match.StartCoroutine(DoSolveMovements(true));
+        return didSomething;
+    }
+
+    // damage/heal/buff
+    public bool DoSolveSpellPriority3() {
+        bool didSomething = false;
+        foreach (Player p in match.players) {
+            TurnSpell spell = p.currentAction.spell;
+            if (spell.spell != null && spell.target != null && !spell.spell.isRecharging) {
+                if (match.currentTurn % 2 == 0) {
+                    if (spell.spell.spell.priorityHeavy == 3) {
+                        match.StartCoroutine(spell.spell.spell.SolveSpellHeavy(p, spell.target, map));
+                        spell.spell.StartCooldownHeavy();
+                        didSomething = true;
+                    }
+                } else {
+                    if (spell.spell.spell.priorityLight == 3) {
+                        match.StartCoroutine(spell.spell.spell.SolveSpellLight(p, spell.target, map));
+                        spell.spell.StartCooldownLight();
+                        didSomething = true;
+                    }
+                }
+            }
+        }
+        return didSomething;
     }
 
 }

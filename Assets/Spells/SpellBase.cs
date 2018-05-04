@@ -16,6 +16,13 @@ public abstract class SpellBase {
     public AreaProfile rangeHeavy;
     public bool lineOfSightLight = true;
     public bool lineOfSightHeavy = true;
+    public int priorityLight = 3;
+    public int priorityHeavy = 3;
+    // PRIORITY
+    // 0 : protec
+    // 1 : tp
+    // 2 : dash
+    // 3 : damage/heal/buff
 
     public abstract IEnumerator SolveSpellLight(Player caster, Cell target, Map map);
     public abstract IEnumerator SolveSpellHeavy(Player caster, Cell target, Map map);

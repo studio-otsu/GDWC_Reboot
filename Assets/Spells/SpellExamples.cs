@@ -200,16 +200,22 @@ public class SpellDash : SpellBase {
         rangeHeavy = new AreaProfile(AreaType.Cross, 3, 3);
         cooldownLight = 4;
         cooldownHeavy = 4;
-    }
+        priorityLight = 2;
+        priorityHeavy = 2;
+}
     public override IEnumerator SolveSpellLight(Player caster, Cell target, Map map) {
-        runningSpells++;
-        //Map.MovePlayerToAdjacentCell(caster,target);
+        runningSpells++; ;
+        List<Cell> path = GetEffectAreaPreviewLight(caster, target, map); // get traversed cells
+        path.Reverse(); // put cells in right order
+        caster.currentAction.move = path; // set as movement to be resolved
         runningSpells--;
         yield return null;
     }
     public override IEnumerator SolveSpellHeavy(Player caster, Cell target, Map map) {
         runningSpells++;
-        //Map.MovePlayerToAdjacentCell(caster, target);
+        List<Cell> path = GetEffectAreaPreviewHeavy(caster, target, map); // get traversed cells
+        path.Reverse(); // put cells in right order
+        caster.currentAction.move = path; // set as movement to be resolved
         runningSpells--;
         yield return null;
     }
@@ -220,23 +226,23 @@ public class SpellDash : SpellBase {
             affectedCells = map.GetCellsRightLine(target, 0, 2);
         } else if (caster.nextCell.x < target.x) { // aim right
             affectedCells = map.GetCellsLeftLine(target, 0, 2);
-        } else if (caster.nextCell.y > target.y) { // aim down
-            affectedCells = map.GetCellsTopLine(target, 0, 2);
-        } else if (caster.nextCell.y < target.y) { // aim up
+        } else if (caster.nextCell.y > target.y) { // aim up
             affectedCells = map.GetCellsBottomLine(target, 0, 2);
+        } else if (caster.nextCell.y < target.y) { // aim down
+            affectedCells = map.GetCellsTopLine(target, 0, 2);
         } else throw new System.Exception("Can't aim at the caster cell!");
         return affectedCells;
     }
     public override List<Cell> GetEffectAreaPreviewLight(Player caster, Cell target, Map map) {
         List<Cell> affectedCells = null;
         if (caster.nextCell.x > target.x) { // aim left
-            affectedCells = map.GetCellsRightLine(target, 0, 2);
+            affectedCells = map.GetCellsRightLine(target, 0, 1);
         } else if (caster.nextCell.x < target.x) { // aim right
-            affectedCells = map.GetCellsLeftLine(target, 0, 2);
-        } else if (caster.nextCell.y > target.y) { // aim down
-            affectedCells = map.GetCellsTopLine(target, 0, 2);
-        } else if (caster.nextCell.y < target.y) { // aim up
-            affectedCells = map.GetCellsBottomLine(target, 0, 2);
+            affectedCells = map.GetCellsLeftLine(target, 0, 1);
+        } else if (caster.nextCell.y > target.y) { // aim up
+            affectedCells = map.GetCellsBottomLine(target, 0, 1);
+        } else if (caster.nextCell.y < target.y) { // aim down
+            affectedCells = map.GetCellsTopLine(target, 0, 1);
         } else throw new System.Exception("Can't aim at the caster cell!");
         return affectedCells;
     }
