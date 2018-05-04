@@ -22,6 +22,8 @@ public class TurnSolver {
                 yield return new WaitForSeconds(0.25f);
             }
         }
+        foreach (Player p in match.players)
+            p.currentAction.move.Clear();
         isSolvingMovements = false;
     }
 
@@ -61,21 +63,26 @@ public class TurnSolver {
                 for (int j = i + 1; j < steps.Count; ++j) {
                     Step b = steps[j];
                     if (Collide(a, b)) { // DAMN SON
-                        if (!dash) // only damage mover during movement, not dashes
+                        if (!dash || a.to == a.from) // only damage mover during movement, not dashes
                             a.p.Damage(4, map, b.p);
                         if (a.to != a.from) { // if player was moving
-                            int x = a.from.x - a.p.currentAction.move[a.p.currentAction.move.Count - 1].x;
-                            int y = a.from.y - a.p.currentAction.move[a.p.currentAction.move.Count - 1].y;
-                            a.p.currentAction.spell.target = map.GetCell(a.p.currentAction.spell.target.x + x,
-                                a.p.currentAction.spell.target.y + y); // reaim spell
+                            if (!dash && a.p.currentAction.spell.spell != null && a.p.currentAction.spell.target != null) { // reaim spell
+                                int x = a.from.x - a.p.currentAction.move[a.p.currentAction.move.Count - 1].x;
+                                int y = a.from.y - a.p.currentAction.move[a.p.currentAction.move.Count - 1].y;
+                                a.p.currentAction.spell.target = map.GetCell(a.p.currentAction.spell.target.x + x,
+                                    a.p.currentAction.spell.target.y + y);
+                            }
                             a.p.currentAction.move.Clear(); // clear movement
                         }
-                        b.p.Damage(4, map, a.p);
+                        if (!dash || b.to == b.from)
+                            b.p.Damage(4, map, a.p);
                         if (b.to != b.from) { // if player was moving
-                            int x = b.from.x - b.p.currentAction.move[b.p.currentAction.move.Count - 1].x;
-                            int y = b.from.y - b.p.currentAction.move[b.p.currentAction.move.Count - 1].y;
-                            b.p.currentAction.spell.target = map.GetCell(b.p.currentAction.spell.target.x + x,
-                                b.p.currentAction.spell.target.y + y); // reaim spell
+                            if (!dash && b.p.currentAction.spell.spell != null && b.p.currentAction.spell.target != null) { // reaim spell
+                                int x = b.from.x - b.p.currentAction.move[b.p.currentAction.move.Count - 1].x;
+                                int y = b.from.y - b.p.currentAction.move[b.p.currentAction.move.Count - 1].y;
+                                b.p.currentAction.spell.target = map.GetCell(b.p.currentAction.spell.target.x + x,
+                                    b.p.currentAction.spell.target.y + y);
+                            }
                             b.p.currentAction.move.Clear(); // clear movement
                         }
                         verified = false; // still need verifications

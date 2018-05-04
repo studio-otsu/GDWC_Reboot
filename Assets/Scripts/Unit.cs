@@ -110,6 +110,8 @@ public class Unit : MonoBehaviour {
             healthCurrent = healthMax;
         if (healthCurrent < 0)
             healthCurrent = 0;
+        turnDamage = 0;
+        turnHeal = 0;
     }
 
     public Color teamColor {
