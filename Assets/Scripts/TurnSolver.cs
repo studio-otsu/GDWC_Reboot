@@ -61,8 +61,8 @@ public class TurnSolver {
                 for (int j = i + 1; j < steps.Count; ++j) {
                     Step b = steps[j];
                     if (Collide(a, b)) { // DAMN SON
-                        if(!dash) // only damage mover during movement, not dashes
-                            a.p.Damage(4);
+                        if (!dash) // only damage mover during movement, not dashes
+                            a.p.Damage(4, map, b.p);
                         if (a.to != a.from) { // if player was moving
                             int x = a.from.x - a.p.currentAction.move[a.p.currentAction.move.Count - 1].x;
                             int y = a.from.y - a.p.currentAction.move[a.p.currentAction.move.Count - 1].y;
@@ -70,7 +70,7 @@ public class TurnSolver {
                                 a.p.currentAction.spell.target.y + y); // reaim spell
                             a.p.currentAction.move.Clear(); // clear movement
                         }
-                        b.p.Damage(4);
+                        b.p.Damage(4, map, a.p);
                         if (b.to != b.from) { // if player was moving
                             int x = b.from.x - b.p.currentAction.move[b.p.currentAction.move.Count - 1].x;
                             int y = b.from.y - b.p.currentAction.move[b.p.currentAction.move.Count - 1].y;
@@ -109,7 +109,12 @@ public class TurnSolver {
         if (DoSolveSpellPriority3()) // damage/heal/buff
             yield return new WaitUntil(delegate { return SpellBase.runningSpells == 0; });
 
-        foreach (Player p in match.players) { // update health balance for each player
+        foreach (Player p in match.players) {
+            p.OnEndTurnBuff(map);
+            p.DecreaseBuffDuration();
+            p.OnEndTurnBuff(map);
+        }
+        foreach (Player p in match.players) {
             p.ApplyTurnDamageHeal();
         }
 

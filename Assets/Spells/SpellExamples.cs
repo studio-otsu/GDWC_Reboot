@@ -24,7 +24,7 @@ public class SpellAttackMelee : SpellBase {
         foreach (Cell c in affectedCells) {
             // damage units
             if (c.currentUnit != null)
-                c.currentUnit.Damage(20);
+                c.currentUnit.Damage(20,map,caster);
             // do pretty explosions. pew pew!
             // ...
         }
@@ -42,7 +42,7 @@ public class SpellAttackMelee : SpellBase {
         foreach (Cell c in affectedCells) {
             // damage units
             if (c.currentUnit != null)
-                c.currentUnit.Damage(30);
+                c.currentUnit.Damage(30, map, caster);
             // do pretty explosions. pew pew!
             // ...
         }
@@ -86,7 +86,7 @@ public class SpellAttackShort : SpellBase {
         foreach (Cell c in affectedCells) {
             // damage units
             if (c.currentUnit != null)
-                c.currentUnit.Damage(16);
+                c.currentUnit.Damage(16, map, caster);
             // do pretty explosions. pew pew!
             // ...
         }
@@ -99,7 +99,7 @@ public class SpellAttackShort : SpellBase {
         foreach (Cell c in affectedCells) {
             // damage units
             if (c.currentUnit != null)
-                c.currentUnit.Damage(20);
+                c.currentUnit.Damage(20, map, caster);
             // do pretty explosions. pew pew!
             // ...
         }
@@ -123,7 +123,7 @@ public class SpellAttackLarge : SpellBase {
         foreach (Cell c in affectedCells) {
             // damage units
             if (c.currentUnit != null)
-                c.currentUnit.Damage(12);
+                c.currentUnit.Damage(12, map, caster);
             // do pretty explosions. pew pew!
             // ...
         }
@@ -136,7 +136,7 @@ public class SpellAttackLarge : SpellBase {
         foreach (Cell c in affectedCells) {
             // damage units
             if (c.currentUnit != null)
-                c.currentUnit.Damage(16);
+                c.currentUnit.Damage(16, map, caster);
             // do pretty explosions. pew pew!
             // ...
         }
@@ -169,7 +169,7 @@ public class SpellAttackLong : SpellBase {
         foreach (Cell c in affectedCells) {
             // damage units
             if (c.currentUnit != null)
-                c.currentUnit.Damage(20);
+                c.currentUnit.Damage(20, map, caster);
             // do pretty explosions. pew pew!
             // ...
         }
@@ -182,7 +182,7 @@ public class SpellAttackLong : SpellBase {
         foreach (Cell c in affectedCells) {
             // damage units
             if (c.currentUnit != null)
-                c.currentUnit.Damage(30);
+                c.currentUnit.Damage(30, map, caster);
             // do pretty explosions. pew pew!
             // ...
         }
@@ -259,13 +259,13 @@ public class SpellHeal : SpellBase {
     }
     public override IEnumerator SolveSpellLight(Player caster, Cell target, Map map) {
         runningSpells++;
-        caster.Heal(8);
+        caster.Heal(8, map, caster);
         runningSpells--;
         yield return null;
     }
     public override IEnumerator SolveSpellHeavy(Player caster, Cell target, Map map) {
         runningSpells++;
-        caster.Heal(12);
+        caster.Heal(12, map, caster);
         runningSpells--;
         yield return null;
     }

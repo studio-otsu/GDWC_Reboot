@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Player : Unit {
 
-    public Player() {
+    public Player() : base() {
         currentAction.player = this;
         currentAction.move = new List<Cell>();
         spells = new PlayerSpell[]{
