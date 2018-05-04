@@ -25,6 +25,7 @@ public abstract class BuffBase {
 
 }
 
+[System.Serializable]
 public class UnitBuff {
     public BuffBase buff;
     public Unit origin;

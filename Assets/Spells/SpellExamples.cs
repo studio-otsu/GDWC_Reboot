@@ -270,3 +270,29 @@ public class SpellHeal : SpellBase {
         yield return null;
     }
 }
+public class SpellProtection : SpellBase {
+    public SpellProtection() {
+        name = "Protection";
+        description = "Réduit les dégâts subis ce tour de 50 % / Réduit les dégâts subis ce tour de 100 %";
+        iconPath = "Sprites/Spells/aura";
+        rangeLight = new AreaProfile(AreaType.Circle, 0, 0);
+        rangeHeavy = new AreaProfile(AreaType.Circle, 0, 0);
+        cooldownLight = 3;
+        cooldownHeavy = 3;
+        priorityLight = 0;
+        priorityHeavy = 0;
+    }
+    public override IEnumerator SolveSpellLight(Player caster, Cell target, Map map) {
+        runningSpells++;
+        caster.AddBuff(caster, new BuffProtection(0.5f), 1, map);
+        runningSpells--;
+        yield return null;
+    }
+    public override IEnumerator SolveSpellHeavy(Player caster, Cell target, Map map) {
+        runningSpells++;
+        caster.AddBuff(caster, new BuffProtection(1), 1, map);
+        runningSpells--;
+        yield return null;
+    }
+}
+

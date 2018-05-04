@@ -112,7 +112,7 @@ public class TurnSolver {
         foreach (Player p in match.players) {
             p.OnEndTurnBuff(map);
             p.DecreaseBuffDuration();
-            p.OnEndTurnBuff(map);
+            p.OnEndBuff(map);
         }
         foreach (Player p in match.players) {
             p.ApplyTurnDamageHeal();
@@ -144,7 +144,6 @@ public class TurnSolver {
         }
         return didSomething;
     }
-
     // tp
     public bool DoSolveSpellPriority1() {
         bool didSomething = false;
@@ -168,7 +167,6 @@ public class TurnSolver {
         }
         return didSomething;
     }
-
     // dash
     public bool DoSolveSpellPriority2() {
         bool didSomething = false;
@@ -193,7 +191,6 @@ public class TurnSolver {
         if (didSomething) match.StartCoroutine(DoSolveMovements(true));
         return didSomething;
     }
-
     // damage/heal/buff
     public bool DoSolveSpellPriority3() {
         bool didSomething = false;

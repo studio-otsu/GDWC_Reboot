@@ -75,7 +75,8 @@ public class Map : MonoBehaviour {
      */
 
     public static void MovePlayerToAdjacentCell(Player player, Cell cell) {
-        if (!IsAdjacent(player.currentCell, cell)) throw new System.Exception("MovePlayerToCell : not adjacent");
+        if (!IsAdjacent(player.currentCell, cell))
+            throw new System.Exception("MovePlayerToCell : not adjacent");
         if (player.currentCell.currentUnit == player) { // in case someone already moved in...
             player.currentCell.currentUnit = null; // don't kick them
         }
