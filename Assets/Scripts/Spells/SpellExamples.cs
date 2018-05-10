@@ -32,6 +32,7 @@ public class SpellAttackMelee : SpellBase {
             ps.Play(true);
             GameObject.Destroy(go, ps.main.duration / ps.main.simulationSpeed);
         }
+        yield return new WaitForSeconds(1);
         runningSpells--;
         yield return null;
     }
@@ -54,6 +55,7 @@ public class SpellAttackMelee : SpellBase {
             ps.Play(true);
             GameObject.Destroy(go, ps.main.duration / ps.main.simulationSpeed);
         }
+        yield return new WaitForSeconds(1);
         runningSpells--;
         yield return null;
     }
@@ -267,13 +269,27 @@ public class SpellHeal : SpellBase {
     }
     public override IEnumerator SolveSpellLight(Player caster, Cell target, Map map) {
         runningSpells++;
+        GameObject effectPrefab = Resources.Load<GameObject>("Prefabs/Particles/HealBurst");
         caster.Heal(8, map, caster);
+        // do pretty explosions. pew pew!
+        GameObject go = GameObject.Instantiate(effectPrefab, target.transform.position, target.transform.rotation);
+        ParticleSystem ps = go.GetComponent<ParticleSystem>();
+        ps.Play(true);
+        GameObject.Destroy(go, ps.main.duration / ps.main.simulationSpeed);
+        yield return new WaitForSeconds(ps.main.duration / ps.main.simulationSpeed);
         runningSpells--;
         yield return null;
     }
     public override IEnumerator SolveSpellHeavy(Player caster, Cell target, Map map) {
         runningSpells++;
+        GameObject effectPrefab = Resources.Load<GameObject>("Prefabs/Particles/HealBurst");
         caster.Heal(12, map, caster);
+        // do pretty explosions. pew pew!
+        GameObject go = GameObject.Instantiate(effectPrefab, target.transform.position, target.transform.rotation);
+        ParticleSystem ps = go.GetComponent<ParticleSystem>();
+        ps.Play(true);
+        GameObject.Destroy(go, ps.main.duration / ps.main.simulationSpeed);
+        yield return new WaitForSeconds(ps.main.duration / ps.main.simulationSpeed);
         runningSpells--;
         yield return null;
     }

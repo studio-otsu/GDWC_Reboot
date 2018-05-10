@@ -11,7 +11,7 @@ public class Player : Unit {
             new PlayerSpell() { spell = new SpellAttackMelee() },
             new PlayerSpell() { spell = new SpellAttackLarge() },
             new PlayerSpell() { spell = new SpellDash() },
-            new PlayerSpell() { spell = new SpellProtection() }};
+            new PlayerSpell() { spell = new SpellHeal() }};
     }
 
     public Cell nextCell {
