@@ -37,7 +37,7 @@ public class MapBuilder {
 
     private void CreateCell(int x, int y, string type) {
         //Create gameobject
-        GameObject createdCellObj = GameObject.Instantiate(cellPrefab, map.CellPosition(x, y), Quaternion.identity, map.transform);
+        GameObject createdCellObj = GameObject.Instantiate(cellPrefab, map.CellPosition(x, y), Quaternion.Euler(90,0,0), map.transform);
         //Set cell attributes
         Cell createdCell = createdCellObj.GetComponent<Cell>();
         createdCell.name = "Cell(" + x + "," + y + ")";
