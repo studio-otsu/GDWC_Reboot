@@ -51,10 +51,10 @@ public class Match : MonoBehaviour {
         // put players on map
         Cell cell1 = output.map.startingACells[0]; // player 1 start pos
         Map.AddUnitToCell(p1, cell1);
-        p1.transform.position = cell1.transform.position;
+        p1.transform.position = cell1.transform.position + new Vector3(0, .5f, 0);
         Cell cell2 = output.map.startingBCells[0]; // player 2 start pos
         Map.AddUnitToCell(p2, cell2);
-        p2.transform.position = cell2.transform.position;
+        p2.transform.position = cell2.transform.position + new Vector3(0, .5f, 0);
         // other stuff
         output.solver = new TurnSolver();
         output.solver.match = output;

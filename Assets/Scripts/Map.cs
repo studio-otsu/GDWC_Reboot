@@ -83,7 +83,7 @@ public class Map : MonoBehaviour {
         player.currentCell = cell;
         cell.currentUnit = player;
         player.UseMP(1);
-        player.transform.position = player.currentCell.transform.position;
+        player.transform.position = player.currentCell.transform.position + new Vector3(0,0.5f,0);
     }
 
     public static void AddUnitToCell(Unit unit, Cell cell) {

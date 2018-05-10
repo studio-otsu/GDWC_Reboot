@@ -107,14 +107,22 @@ public class TurnSolver {
 
     public IEnumerator DoSolveSpells() {
         isSolvingSpells = true;
-        if (DoSolveSpellPriority0()) // protec
+        if (DoSolveSpellPriority0()) { // protec
+            yield return null;
             yield return new WaitUntil(delegate { return SpellBase.runningSpells == 0; });
-        if (DoSolveSpellPriority1()) // tp
+        }
+        if (DoSolveSpellPriority1()) { // tp
+            yield return null;
             yield return new WaitUntil(delegate { return SpellBase.runningSpells == 0; });
-        if (DoSolveSpellPriority2()) // dash
+        }
+        if (DoSolveSpellPriority2()) { // dash
+            yield return null;
             yield return new WaitWhile(delegate { return isSolvingMovements; });
-        if (DoSolveSpellPriority3()) // damage/heal/buff
+        }
+        if (DoSolveSpellPriority3()) { // damage/heal/buff
+            yield return null;
             yield return new WaitUntil(delegate { return SpellBase.runningSpells == 0; });
+        }
 
         foreach (Player p in match.players) {
             p.OnEndTurnBuff(map);

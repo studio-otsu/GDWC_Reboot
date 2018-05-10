@@ -15,7 +15,7 @@ public class SpellAttackMelee : SpellBase {
     }
     public override IEnumerator SolveSpellLight(Player caster, Cell target, Map map) {
         runningSpells++;
-        GameObject effectPrefab = Resources.Load<GameObject>("Prefabs/Particles/FireBurst");
+        GameObject effectPrefab = Resources.Load<GameObject>("Prefabs/Particles/SparkBurst");
         List<Cell> affectedCells = null;
         if (caster.currentCell.x != target.x) { // attack left or right
             affectedCells = map.GetCellsVerticalLine(target, 0, 1);
@@ -27,14 +27,13 @@ public class SpellAttackMelee : SpellBase {
             if (c.currentUnit != null)
                 c.currentUnit.Damage(20, map, caster);
             // do pretty explosions. pew pew!
-            GameObject go = GameObject.Instantiate(effectPrefab, c.transform.position, c.transform.rotation);
+            GameObject go = GameObject.Instantiate(effectPrefab, c.transform.position, Quaternion.identity);
             ParticleSystem ps = go.GetComponent<ParticleSystem>();
             ps.Play(true);
             GameObject.Destroy(go, ps.main.duration / ps.main.simulationSpeed);
         }
         yield return new WaitForSeconds(1);
         runningSpells--;
-        yield return null;
     }
     public override IEnumerator SolveSpellHeavy(Player caster, Cell target, Map map) {
         runningSpells++;
@@ -50,14 +49,13 @@ public class SpellAttackMelee : SpellBase {
             if (c.currentUnit != null)
                 c.currentUnit.Damage(30, map, caster);
             // do pretty explosions. pew pew!
-            GameObject go = GameObject.Instantiate(effectPrefab, c.transform.position, c.transform.rotation);
+            GameObject go = GameObject.Instantiate(effectPrefab, c.transform.position, Quaternion.identity);
             ParticleSystem ps = go.GetComponent<ParticleSystem>();
             ps.Play(true);
             GameObject.Destroy(go, ps.main.duration / ps.main.simulationSpeed);
         }
         yield return new WaitForSeconds(1);
         runningSpells--;
-        yield return null;
     }
 
     public override List<Cell> GetEffectAreaPreviewHeavy(Player caster, Cell target, Map map) {
@@ -129,29 +127,37 @@ public class SpellAttackLarge : SpellBase {
     }
     public override IEnumerator SolveSpellLight(Player caster, Cell target, Map map) {
         runningSpells++;
+        GameObject effectPrefab = Resources.Load<GameObject>("Prefabs/Particles/FireBurst");
         List<Cell> affectedCells = map.GetCellsCross(target, 0, 1);
         foreach (Cell c in affectedCells) {
             // damage units
             if (c.currentUnit != null)
                 c.currentUnit.Damage(12, map, caster);
             // do pretty explosions. pew pew!
-            // ...
+            GameObject go = GameObject.Instantiate(effectPrefab, c.transform.position, Quaternion.identity);
+            ParticleSystem ps = go.GetComponent<ParticleSystem>();
+            ps.Play(true);
+            GameObject.Destroy(go, ps.main.duration / ps.main.simulationSpeed);
         }
+        yield return new WaitForSeconds(1);
         runningSpells--;
-        yield return null;
     }
     public override IEnumerator SolveSpellHeavy(Player caster, Cell target, Map map) {
         runningSpells++;
+        GameObject effectPrefab = Resources.Load<GameObject>("Prefabs/Particles/FireBurst");
         List<Cell> affectedCells = map.GetCellsCross(target, 0, 1);
         foreach (Cell c in affectedCells) {
             // damage units
             if (c.currentUnit != null)
                 c.currentUnit.Damage(16, map, caster);
             // do pretty explosions. pew pew!
-            // ...
+            GameObject go = GameObject.Instantiate(effectPrefab, c.transform.position, Quaternion.identity);
+            ParticleSystem ps = go.GetComponent<ParticleSystem>();
+            ps.Play(true);
+            GameObject.Destroy(go, ps.main.duration / ps.main.simulationSpeed);
         }
+        yield return new WaitForSeconds(1);
         runningSpells--;
-        yield return null;
     }
 
     public override List<Cell> GetEffectAreaPreviewHeavy(Player caster, Cell target, Map map) {
@@ -272,26 +278,24 @@ public class SpellHeal : SpellBase {
         GameObject effectPrefab = Resources.Load<GameObject>("Prefabs/Particles/HealBurst");
         caster.Heal(8, map, caster);
         // do pretty explosions. pew pew!
-        GameObject go = GameObject.Instantiate(effectPrefab, target.transform.position, target.transform.rotation);
+        GameObject go = GameObject.Instantiate(effectPrefab, target.transform.position, Quaternion.identity);
         ParticleSystem ps = go.GetComponent<ParticleSystem>();
         ps.Play(true);
         GameObject.Destroy(go, ps.main.duration / ps.main.simulationSpeed);
         yield return new WaitForSeconds(ps.main.duration / ps.main.simulationSpeed);
         runningSpells--;
-        yield return null;
     }
     public override IEnumerator SolveSpellHeavy(Player caster, Cell target, Map map) {
         runningSpells++;
         GameObject effectPrefab = Resources.Load<GameObject>("Prefabs/Particles/HealBurst");
         caster.Heal(12, map, caster);
         // do pretty explosions. pew pew!
-        GameObject go = GameObject.Instantiate(effectPrefab, target.transform.position, target.transform.rotation);
+        GameObject go = GameObject.Instantiate(effectPrefab, target.transform.position, Quaternion.identity);
         ParticleSystem ps = go.GetComponent<ParticleSystem>();
         ps.Play(true);
         GameObject.Destroy(go, ps.main.duration / ps.main.simulationSpeed);
         yield return new WaitForSeconds(ps.main.duration / ps.main.simulationSpeed);
         runningSpells--;
-        yield return null;
     }
 }
 public class SpellProtection : SpellBase {
@@ -309,14 +313,14 @@ public class SpellProtection : SpellBase {
     public override IEnumerator SolveSpellLight(Player caster, Cell target, Map map) {
         runningSpells++;
         caster.AddBuff(caster, new BuffProtection(0.5f), 1, map);
+        yield return new WaitForSeconds(0.5f);
         runningSpells--;
-        yield return null;
     }
     public override IEnumerator SolveSpellHeavy(Player caster, Cell target, Map map) {
         runningSpells++;
         caster.AddBuff(caster, new BuffProtection(1), 1, map);
+        yield return new WaitForSeconds(0.5f);
         runningSpells--;
-        yield return null;
     }
 }
 
