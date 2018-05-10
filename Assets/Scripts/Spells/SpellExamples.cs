@@ -15,6 +15,7 @@ public class SpellAttackMelee : SpellBase {
     }
     public override IEnumerator SolveSpellLight(Player caster, Cell target, Map map) {
         runningSpells++;
+        GameObject effectPrefab = Resources.Load<GameObject>("Prefabs/Particles/FireBurst");
         List<Cell> affectedCells = null;
         if (caster.currentCell.x != target.x) { // attack left or right
             affectedCells = map.GetCellsVerticalLine(target, 0, 1);
@@ -24,15 +25,19 @@ public class SpellAttackMelee : SpellBase {
         foreach (Cell c in affectedCells) {
             // damage units
             if (c.currentUnit != null)
-                c.currentUnit.Damage(20,map,caster);
+                c.currentUnit.Damage(20, map, caster);
             // do pretty explosions. pew pew!
-            // ...
+            GameObject go = GameObject.Instantiate(effectPrefab, c.transform.position, c.transform.rotation);
+            ParticleSystem ps = go.GetComponent<ParticleSystem>();
+            ps.Play(true);
+            GameObject.Destroy(go, ps.main.duration / ps.main.simulationSpeed);
         }
         runningSpells--;
         yield return null;
     }
     public override IEnumerator SolveSpellHeavy(Player caster, Cell target, Map map) {
         runningSpells++;
+        GameObject effectPrefab = Resources.Load<GameObject>("Prefabs/Particles/SparkBurst");
         List<Cell> affectedCells = null;
         if (caster.currentCell.x != target.x) { // attack left or right
             affectedCells = map.GetCellsVerticalLine(target, 0, 1);
@@ -44,7 +49,10 @@ public class SpellAttackMelee : SpellBase {
             if (c.currentUnit != null)
                 c.currentUnit.Damage(30, map, caster);
             // do pretty explosions. pew pew!
-            // ...
+            GameObject go = GameObject.Instantiate(effectPrefab, c.transform.position, c.transform.rotation);
+            ParticleSystem ps = go.GetComponent<ParticleSystem>();
+            ps.Play(true);
+            GameObject.Destroy(go, ps.main.duration / ps.main.simulationSpeed);
         }
         runningSpells--;
         yield return null;
@@ -202,7 +210,7 @@ public class SpellDash : SpellBase {
         cooldownHeavy = 4;
         priorityLight = 2;
         priorityHeavy = 2;
-}
+    }
     public override IEnumerator SolveSpellLight(Player caster, Cell target, Map map) {
         runningSpells++; ;
         List<Cell> path = GetEffectAreaPreviewLight(caster, target, map); // get traversed cells
