@@ -23,9 +23,9 @@ public class Map : MonoBehaviour {
     }
 
     public Vector3 CellPosition(int x, int y) {
-        float xPos = -((float)(width / 2)) + x;
-        float yPos = -((float)(height / 2)) - y + height;
-        return new Vector3(xPos, yPos);
+        float xPos = x - (width / 2.0f);
+        float yPos = -y + height - (height / 2.0f);
+        return new Vector3(xPos, 0, yPos);
     }
 
     public Vector3 CellPosition(Cell c) {
@@ -122,19 +122,16 @@ public class Map : MonoBehaviour {
         return path;
     }
 
-    public Dictionary<Cell, Cell> BreadthFirstSearchPrevious(Cell start, int maxDistance = 30)
-    {
+    public Dictionary<Cell, Cell> BreadthFirstSearchPrevious(Cell start, int maxDistance = 30) {
         Queue<Cell> cells = new Queue<Cell>();
         Dictionary<Cell, Cell> previousCells = new Dictionary<Cell, Cell>();
         List<Cell> markedCells = new List<Cell>();
         cells.Enqueue(start);
         start.marked = true;
         markedCells.Add(start);
-        while (cells.Count > 0)
-        {
+        while (cells.Count > 0) {
             Cell current = cells.Dequeue();
-            if (Map.Distance(start, current) < maxDistance)
-            {
+            if (Map.Distance(start, current) < maxDistance) {
                 AddNeighbor(current, RightCell(current), cells, markedCells, previousCells);
                 AddNeighbor(current, TopCell(current), cells, markedCells, previousCells);
                 AddNeighbor(current, LeftCell(current), cells, markedCells, previousCells);
@@ -143,16 +140,14 @@ public class Map : MonoBehaviour {
         }
 
         //Clear
-        foreach (Cell cell in markedCells)
-        {
+        foreach (Cell cell in markedCells) {
             cell.marked = false;
         }
 
         return previousCells;
     }
 
-    public List<Cell> BreadthFirstSearch(Cell start, int maxDistance = 30)
-    {
+    public List<Cell> BreadthFirstSearch(Cell start, int maxDistance = 30) {
         Dictionary<Cell, Cell> previousCells = BreadthFirstSearchPrevious(start, maxDistance);
         return previousCells.Keys.ToList<Cell>();
     }
@@ -186,7 +181,7 @@ public class Map : MonoBehaviour {
                 Cell c = GetCell(x, y);
                 if (c != null) {
                     int distance = Distance(center, c);
-                    if (distance >= Mathf.Min(min, max) && distance <= Mathf.Max(min, max) &&(!checkLineOfSight||inLineOfSight(center,c))) {
+                    if (distance >= Mathf.Min(min, max) && distance <= Mathf.Max(min, max) && (!checkLineOfSight || inLineOfSight(center, c))) {
                         output.Add(c);
                     }
                 }
@@ -237,7 +232,7 @@ public class Map : MonoBehaviour {
         List<Cell> output = new List<Cell>();
         for (int i = Mathf.Min(min, max); i <= Mathf.Max(min, max); ++i) {
             Cell c = GetCell(center.x + i, center.y);
-            if (c != null && (!checkLineOfSight || inLineOfSight(center,c)))
+            if (c != null && (!checkLineOfSight || inLineOfSight(center, c)))
                 output.Add(c);
         }
         return output;
@@ -261,12 +256,10 @@ public class Map : MonoBehaviour {
             if (error > 0) {
                 x += x_inc;
                 error -= dy;
-            }
-            else if (error < 0) {
+            } else if (error < 0) {
                 y += y_inc;
                 error += dx;
-            }
-            else {
+            } else {
                 x += x_inc;
                 error -= dy;
                 y += y_inc;
@@ -277,19 +270,16 @@ public class Map : MonoBehaviour {
 
         while (n > 0) {
 
-            if(GetCell(x,y).type == Cell.CellType.OBSTACLE) {
+            if (GetCell(x, y).type == Cell.CellType.OBSTACLE) {
                 return false;
-            }
-            else {
+            } else {
                 if (error > 0) {
                     x += x_inc;
                     error -= dy;
-                }
-                else if (error < 0) {
+                } else if (error < 0) {
                     y += y_inc;
                     error += dx;
-                }
-                else {
+                } else {
                     x += x_inc;
                     error -= dy;
                     y += y_inc;
